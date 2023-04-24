@@ -7,7 +7,7 @@
 class RendererLayer : public Walnut::Layer
 {
 private:
-	Renderer renderer;
+	rt::Renderer renderer;
 
 public:
 	RendererLayer()
@@ -23,7 +23,7 @@ public:
 			ImGui::Text("Last Render: %.3fms", renderer.frametime);
 			if (ImGui::Button("Render"))
 			{
-				renderer.render();
+				renderer.Render();
 			}
 			ImGui::End();
 		}
@@ -34,8 +34,8 @@ public:
 
 			auto avail = ImGui::GetContentRegionAvail();
 
-			renderer.resize(static_cast<uint32_t>(avail.x), 
-							static_cast<uint32_t>(avail.y));
+			renderer.Resize(static_cast<std::uint32_t>(avail.x), 
+							static_cast<std::uint32_t>(avail.y));
 
 			if (renderer.image != nullptr)
 			{
@@ -49,7 +49,7 @@ public:
 			ImGui::End();
 			ImGui::PopStyleVar();
 
-			renderer.render();
+			renderer.Render();
 		}
 	}
 };

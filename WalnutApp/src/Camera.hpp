@@ -4,40 +4,39 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-class Camera
+namespace rt
 {
-public:
-	Camera(float verticalFOV, float nearClip, float farClip);
+	class Camera
+	{
+	public:
+		Camera(float vfov, float nearclip, float farclip) noexcept;
 
-	bool OnUpdate(float ts);
-	void OnResize(uint32_t width, uint32_t height);
+		bool OnUpdate(float ts) noexcept;
+		void OnResize(std::uint32_t width, std::uint32_t height) noexcept;
 
-private:
-	void RecalculateProjection();
-	void RecalculateView();
-	void RecalculateRayDirections();
-public:
-	glm::mat4 projection{ 1.0f };
-	glm::mat4 view{ 1.0f };
-	glm::mat4 iprojection{ 1.0f };
-	glm::mat4 iview{ 1.0f };
+	private:
+		void RecalculateProjection(void) noexcept;
+		void RecalculateView(void) noexcept;
+		void RecalculateRayDirections(void) noexcept;
 
-	float vfov = 45.0f;
-	float nearclip = 0.1f;
-	float farclip = 100.0f;
+	public:
+		glm::mat4 projection{ 1.0f }, iprojection{ 1.0f }, view{ 1.0f }, iview{ 1.0f };
 
-	bool moved = false;
+		float vfov = 70.0f;
 
-	const float rotation_speed = 0.3f;
+		float nearclip = 0.1f, farclip = 100.0f;
 
-	glm::vec3 pos{ 0.0f, 0.5f, -2.0f };
-	glm::vec3 dir{ 0.0f, 0.0f, 0.0f };
+		bool moved = false;
 
-	std::vector<glm::vec3> rays;
+		glm::vec3 pos{ 0.0f, 0.5f, -2.0f },
+				  dir{ 0.0f, 0.0f,  0.0f };
 
-	glm::vec2 lastmouse{ 0.0f, 0.0f };
+		std::vector<glm::vec3> rays;
 
-	uint32_t width = 0, height = 0;
-};
+		glm::vec2 lastmouse{ 0.0f, 0.0f };
+
+		std::uint32_t width = 0, height = 0;
+	};
+}
 
 #endif

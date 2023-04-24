@@ -53,7 +53,7 @@ namespace rt
 
 		Intersection* closest = nullptr;
 
-		Sphere s{ { 0, -1, 0 }, 1.0f, { .8, .8, .8 }, 1, 0 };
+		Sphere s{ { 0, -1, 0 }, 1.0f, { 0, 0, 1 }, 1, 0 };
 
 		Sphere a{ { 0, 1000, 0}, 1000, { .6, .6, .6 }, 1, 0 };
 		Sphere b{ { 1003, 0, 0}, 1000, { .6, .6, .6 }, 0, 1 };

@@ -64,9 +64,6 @@ namespace rt
 					const auto hit = pos + (dir * t);
 					const auto normal = glm::normalize(hit - sphere.pos);
 
-					//auto intensity = glm::max(glm::dot(normal, -light), 0.f);
-					//return (sphere.diffuse * intensity);
-
 					if (t < distance)
 					{
 						distance = t;
@@ -101,7 +98,6 @@ namespace rt
 
 		for (auto bounce = 0; bounce < bounces; bounce++)
 		{
-			//early return sky color
 			if (intersection == Miss())
 			{
 				glm::vec3 sky(.6f, .7f, .9f);
@@ -109,31 +105,13 @@ namespace rt
 				break;
 			}
 
-			//applies diffuse color to bounce
 			direct += (intersection.color * multiplier);
-
-			//adjust multiplier to half after each bounce
 			multiplier *= .5f;
 
-			//adjust out a bit so tracing doesn't re-collide with same sphere
 			pos = intersection.pos + (intersection.normal * .001f);
 
-			//implements roughness (randomness in reflections)
 			const auto ddelta = .5f * intersection.object->roughness;
 			dir = glm::reflect(dir, intersection.normal + Walnut::Random::Vec3(-ddelta, ddelta));
-
-			//determine if the pixel is occcluded by an object
-			if (const auto shadow = TraceRay(pos, light); shadow != Miss())
-			{
-				const auto distance = shadow.exit - shadow.distance;
-				const auto parameter = distance / intersection.object->radius;
-
-				const auto dimness = (1 / (distance + 1));
-				//const auto dimness = std::max(std::cos(parameter), 0.f);
-				//const auto dimness = std::cos((PI / 4) * parameter);
-
-				direct *= dimness;
-			}
 
 			intersection = TraceRay(camera.pos, dir + Walnut::Random::Vec3(-offset, offset));
 		}
@@ -144,7 +122,6 @@ namespace rt
 			{
 				auto ray = Walnut::Random::InUnitSphere();
 
-				//put it in the normal-facing hemisphere
 				if (glm::dot(ray, first.normal) < 0)
 					ray = -ray;
 
@@ -154,7 +131,6 @@ namespace rt
 			}
 
 			indirect /= samples;
-
 			final = (direct + indirect) * first.color / PI;
 		}
 		

@@ -1,8 +1,8 @@
-#include "Renderer.hpp"
+#include "renderer.h"
 
 namespace
 {
-	std::uint32_t RGBA(glm::vec4 in) noexcept
+	std::uint32_t RGBA(cjl::vec4 in) noexcept
 	{
 		std::uint32_t out = 0;
 
@@ -33,12 +33,12 @@ namespace rt
 	{
 	}
 
-	Intersection Renderer::Miss(void) noexcept
+	Intersection Renderer::miss(void) noexcept
 	{
-		return { glm::vec3(.6, .7, .95), glm::vec3(0), glm::vec3(0), 0, 0, nullptr };
+		return { cjl::vec3(.6, .7, .95), cjl::vec3(0), cjl::vec3(0), 0, 0, nullptr };
 	}
 
-	Intersection Renderer::TraceRay(glm::vec3 pos, glm::vec3 dir) noexcept
+	Intersection Renderer::trace_ray(const Ray& ray) noexcept
 	{
 		auto distance = max;
 
@@ -46,23 +46,24 @@ namespace rt
 
 		for (auto& sphere : spheres)
 		{
-			const auto dif = pos - sphere.pos;
+			const auto diff = ray.pos - sphere.pos;
 
-			const auto a = glm::dot(dir, dir);
-			const auto b = 2 * glm::dot(dif, dir);
-			const auto c = glm::dot(dif, dif) - (sphere.radius * sphere.radius);
+			const auto a = cjl::dot(ray.dir, ray.dir);
+			const auto b = 2 * cjl::dot(dif, ray.dir);
+			const auto c = cjl::dot(diff, diff) - (sphere.radius * sphere.radius);
 
+			// descriminant
 			const auto d = (b * b) - (4 * a * c);
 
 			if (d > 0) [[unlikely]]
 			{
-				const auto t = (-b - glm::sqrt(d)) / (2 * a);
-				const auto e = (-b + glm::sqrt(d)) / (2 * a);
+				const auto t = (-b - cjl::sqrt(d)) / (2 * a);
+				const auto e = (-b + cjl::sqrt(d)) / (2 * a);
 
 				if (t > 0) [[likely]]
 				{
-					const auto hit = pos + (dir * t);
-					const auto normal = glm::normalize(hit - sphere.pos);
+					const auto hit = ray.pos + (ray.dir * t);
+					const auto normal = cjl::normalize(hit - sphere.pos);
 
 					if (t < distance)
 					{
@@ -76,15 +77,15 @@ namespace rt
 		//no object was hit
 		if (distance == max) [[likely]]
 		{
-			return Miss();
+			return miss();
 		}
 
 		return intersection;
 	}
 
-	glm::vec3 Renderer::PerPixel(std::uint32_t x, std::uint32_t y) noexcept
+	cjl::vec3 Renderer::PerPixel(std::uint32_t x, std::uint32_t y) noexcept
 	{
-		glm::vec3 direct(0), indirect(0), final(0);
+		cjl::vec3 direct{}, indirect{}, result{};
 
 		auto dir = camera.rays[y * camera.width + x];
 		auto pos = camera.pos;
@@ -100,7 +101,7 @@ namespace rt
 		{
 			if (intersection == Miss())
 			{
-				glm::vec3 sky(.6f, .7f, .9f);
+				const scjl::vec3 sky(.6f, .7f, .9f);
 				direct += (sky * multiplier);
 				break;
 			}
@@ -111,18 +112,18 @@ namespace rt
 			pos = intersection.pos + (intersection.normal * .001f);
 
 			const auto ddelta = .5f * intersection.object->roughness;
-			dir = glm::reflect(dir, intersection.normal + Walnut::Random::Vec3(-ddelta, ddelta));
+			dir = cjl::reflect(dir, intersection.normal + Walnut::Random::Vec3(-ddelta, ddelta));
 
 			intersection = TraceRay(camera.pos, dir + Walnut::Random::Vec3(-offset, offset));
 		}
 		
-		if (first != Miss())
+		if (first != miss())
 		{
 			for (auto sample = 0; sample < samples; sample++)
 			{
 				auto ray = Walnut::Random::InUnitSphere();
 
-				if (glm::dot(ray, first.normal) < 0)
+				if (cjl::dot(ray, first.normal) < 0)
 					ray = -ray;
 
 				const auto cast = TraceRay(first.pos, first.normal + ray);
@@ -131,15 +132,15 @@ namespace rt
 			}
 
 			indirect /= samples;
-			final = (direct + indirect) * first.color / PI;
+			result = (direct + indirect) * first.color / PI;
 		}
 		
 		else
 		{
-			final = first.color;
+			result = first.color;
 		}
 
-		auto tonemap = [&](glm::vec3 in)
+		auto tonemap = [&](cjl::vec3 in)
 		{
 			auto func = [&](float in)
 			{
@@ -155,9 +156,9 @@ namespace rt
 			return out;
 		};
 
-		final = tonemap(final);
+		result = tonemap(result);
 
-		return final;
+		return result;
 	}
 
 	void Renderer::Render(void) noexcept
@@ -176,7 +177,7 @@ namespace rt
 			framecount = 1.f;
 
 			delete[] accumulatedData;
-			accumulatedData = new glm::vec3[width * height]();
+			accumulatedData = new cjl::vec3[width * height]();
 			camera.moved = false;
 		}
 
@@ -222,6 +223,6 @@ namespace rt
 		imageData = new uint32_t[width * height];
 
 		delete[] accumulatedData;
-		accumulatedData = new glm::vec3[width * height]();
+		accumulatedData = new cjl::vec3[width * height]();
 	}
 }

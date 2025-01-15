@@ -1,37 +1,33 @@
-#ifndef RAYTRACER_HPP
-#define RAYTRACER_HPP
+#ifndef LUMA_RENDERER_H
+#define LUMA_RENDERER_H
 
-#include <Walnut/Image.h>
-#include <Walnut/Timer.h>
-#include <Walnut/Random.h>
-
-#include <glm/glm.hpp>
 #include <cstdint>
 #include <vector>
 
-#include "Camera.hpp"
+#include "vector.h"
+#include "camera.h"
 
-namespace rt
+namespace luma
 {
 	struct Ray
 	{
-		glm::vec3 pos, dir;
+		cjl::vec3 pos, dir;
 	};
 
 	struct Sphere
 	{
-		glm::vec3 pos;
+		cjl::vec3 pos;
 		float radius;
 
-		glm::vec3 diffuse;
+		cjl::vec3 diffuse;
 		float metallic, roughness;
 	};
 
 	struct Intersection
 	{
-		glm::vec3 color;
-		glm::vec3 pos;
-		glm::vec3 normal;
+		cjl::vec3 color;
+		cjl::vec3 pos;
+		cjl::vec3 normal;
 		float distance, exit;
 		Sphere* object;
 
@@ -44,10 +40,9 @@ namespace rt
 		bool accumulate = true;
 		float frametime = 0.f;
 		
-		Walnut::Image* image = nullptr;
-		std::uint32_t* imageData = nullptr;
-		glm::vec3* accumulatedData = nullptr;
-		float framecount = 1.f;
+		std::uint32_t* image_data = nullptr;
+		cjl::vec3* accumulated_data = nullptr;
+		float frame_count = 1.f;
 
 		Camera camera;
 
@@ -71,13 +66,11 @@ namespace rt
 	public:
 		Renderer(void) noexcept;
 		void Render(void) noexcept;
-		void Resize(std::uint32_t width, std::uint32_t height) noexcept;
 
 	private:
-		Intersection Miss(void) noexcept;
-		Intersection TraceRay(glm::vec3 pos, glm::vec3 dir) noexcept;
-
-		glm::vec3 PerPixel(std::uint32_t x, std::uint32_t y) noexcept;
+		Intersection miss(void) noexcept;
+		Intersection trace_ray(const Ray&) noexcept;
+		glm::vec3 render_pixel(std::uint32_t, std::uint32_t) noexcept;
 	};
 }
 

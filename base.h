@@ -1,5 +1,5 @@
-#ifndef GEO_BASE_H
-#define GEO_BASE_H
+#ifndef LUMA_BASE_H
+#define LUMA_BASE_H
 
 #include "float.h"
 

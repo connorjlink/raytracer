@@ -1,37 +1,36 @@
-#pragma once
+#ifndef LUMA_RANDOM_H
+#define LUMA_RANDOM_H
 
 #include <random>
 
-#include <glm/glm.hpp>
-
-namespace Walnut {
-
+namespace luma
+{
 	class Random
 	{
 	public:
 		static void Init()
 		{
-			s_RandomEngine.seed(std::random_device()());
+			_engine.seed(std::random_device()());
 		}
 
-		static uint32_t UInt()
+		static std::uint32_t uint()
 		{
-			return s_Distribution(s_RandomEngine);
+			return _distribution(_engine);
 		}
 
-		static uint32_t UInt(uint32_t min, uint32_t max)
+		static std::uint32_t UInt(std::uint32_t min, std::uint32_t max)
 		{
-			return min + (s_Distribution(s_RandomEngine) % (max - min + 1));
+			return min + (_distribution(_engine) % (max - min + 1));
 		}
 
 		static float Float()
 		{
-			return (float)s_Distribution(s_RandomEngine) / (float)std::numeric_limits<uint32_t>::max();
+			return static_cast<float>(_distribution(_engine)) / std::numeric_limits<uint32_t>::max();
 		}
 
-		static glm::vec3 Vec3()
+		static cjl::vec3 Vec3()
 		{
-			return glm::vec3(Float(), Float(), Float());
+			return cjl::vec3(Float(), Float(), Float());
 		}
 
 		static glm::vec3 Vec3(float min, float max)
@@ -39,15 +38,16 @@ namespace Walnut {
 			return glm::vec3(Float() * (max - min) + min, Float() * (max - min) + min, Float() * (max - min) + min);
 		}
 
-		static glm::vec3 InUnitSphere()
+		static cjl::vec3 InUnitSphere()
 		{
-			return glm::normalize(Vec3(-1.0f, 1.0f));
+			return cjl::normalize(Vec3(-1.0f, 1.0f));
 		}
+
 	private:
-		static std::mt19937 s_RandomEngine;
-		static std::uniform_int_distribution<std::mt19937::result_type> s_Distribution;
+		static std::mt19937 _engine;
+		static std::uniform_int_distribution<std::mt19937::result_type> _distribution;
 	};
 
 }
 
-
+#endif

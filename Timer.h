@@ -1,53 +1,71 @@
-#pragma once
+#ifndef LUMA_TIMER_H
+#define LUMA_TIMER_H
 
 #include <iostream>
 #include <string>
 #include <chrono>
 
-namespace Walnut {
-
+namespace cjl
+{
 	class Timer
 	{
 	public:
 		Timer()
 		{
-			Reset();
+			reset();
 		}
 
-		void Reset()
+	public:
+		void reset()
 		{
-			m_Start = std::chrono::high_resolution_clock::now();
-		}
-
-		float Elapsed()
-		{
-			return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - m_Start).count() * 0.001f * 0.001f * 0.001f;
-		}
-
-		float ElapsedMillis()
-		{
-			return Elapsed() * 1000.0f;
+			_start = std::chrono::high_resolution_clock::now();
 		}
 
 	private:
-		std::chrono::time_point<std::chrono::high_resolution_clock> m_Start;
+		auto _delta()
+		{
+			const auto now = std::chrono::high_resolution_clock::now();
+			const auto diff = now - _start;
+			return diff;
+		}
+
+	public:
+		float seconds()
+		{
+			const auto diff = _delta();
+			const auto result = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
+			return result;
+		}
+
+		float milliseconds()
+		{
+			const auto diff = _delta();
+			const auto result = std::chrono::duration_cast<std::chrono::milliseconds>(diff).count();
+			return result;
+		}
+
+	private:
+		std::chrono::time_point<std::chrono::high_resolution_clock> _start;
 	};
 
-	class ScopedTimer
+	class AutoTimer
 	{
 	public:
-		ScopedTimer(const std::string& name)
-			: m_Name(name) {}
-		~ScopedTimer()
+		AutoTimer(const std::string& name)
+			: _name(name) 
 		{
-			float time = m_Timer.ElapsedMillis();
-			std::cout << "[TIMER] " << m_Name << " - " << time << "ms\n";
+			_timer{};
+		}
+
+		~AutoTimer()
+		{
+			float time = _timer.milliseconds();
+			std::println("[TIMER] {} - {}ms");
 		}
 	private:
-		std::string m_Name;
-		Timer m_Timer;
+		std::string _name;
+		Timer _timer;
 	};
-
-
-
 }
+
+#endif

@@ -1,5 +1,5 @@
-#ifndef GEO_MATRIX_H
-#define GEO_MATRIX_H
+#ifndef LUMA_MATRIX_H
+#define LUMA_MATRIX_H
 
 #include "base.h"
 #include "vector.h"

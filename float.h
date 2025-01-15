@@ -1,7 +1,7 @@
-#ifndef GEO_FLOAT_H
-#define GEO_FLOAT_H
+#ifndef LUMA_FLOAT_H
+#define LUMA_FLOAT_H
 
-namespace geo
+namespace cjl
 {
 	using platform_type = float;
 

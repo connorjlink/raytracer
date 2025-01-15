@@ -1,14 +1,14 @@
 #ifndef LUMA_BASE_H
 #define LUMA_BASE_H
 
-#include "float.h"
-
-#include <cstdlib>
+#include <algorithm>
 #include <array>
 
-namespace geo
+#include "float.h"
+
+namespace cjl
 {
-	template<std::size_t M = 4, typename T = platform_type>
+	template<std::size_t M = 4, typename T = geo::platform_type>
 	class vec
 	{
 	private:

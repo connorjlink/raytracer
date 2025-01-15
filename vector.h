@@ -1,13 +1,13 @@
-#ifndef GEO_VECTOR_H
-#define GEO_VECTOR_H
-
-#include "base.h"
-#include "matrix.h"
+#ifndef LUMA_VECTOR_H
+#define LUMA_VECTOR_H
 
 #include <algorithm>
 #include <numeric>
 
-namespace geo
+#include "base.h"
+#include "matrix.h"
+
+namespace cjl
 {
 	template<std::size_t M = 4, typename T = platform_type>
 	constexpr vec<M, T> broadcast(T scalar)

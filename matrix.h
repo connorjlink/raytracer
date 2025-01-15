@@ -4,7 +4,7 @@
 #include "base.h"
 #include "vector.h"
 
-namespace geo
+namespace cjl
 {
 	template<std::size_t M = 4, typename T = platform_type>
 	constexpr mat<M, M, T> identity()

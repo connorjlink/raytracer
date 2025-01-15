@@ -1,17 +1,12 @@
 #ifndef LUMA_RANDOM_H
 #define LUMA_RANDOM_H
 
-#include <random>
-
 namespace luma
 {
 	class Random
 	{
 	public:
-		static void Init()
-		{
-			_engine.seed(std::random_device()());
-		}
+		static void init();
 
 		static std::uint32_t uint()
 		{

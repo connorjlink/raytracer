@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "types.h"
 #include "vector.h"
 #include "matrix.h"
 
@@ -15,14 +16,14 @@ namespace luma
 		bool OnUpdate(float) noexcept;
 
 	private:
-		void RecalculateProjection(void) noexcept;
-		void RecalculateView(void) noexcept;
-		void RecalculateRayDirections(void) noexcept;
+		void recompute_projection(void) noexcept;
+		void recompute_view(void) noexcept;
+		void recompute_rays(void) noexcept;
 
 	public:
-		cjl::mat4 projection{ 1.0f }, iprojection{ 1.0f }, view{ 1.0f }, iview{ 1.0f };
+		cjl::mat4 projection, projection_inverse, view, view_inverse;
 
-		float vfov = 70.0f;
+		float fov = 70.0f;
 
 		float nearclip = 0.1f, farclip = 100.0f;
 

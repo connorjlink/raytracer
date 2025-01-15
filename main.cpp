@@ -40,12 +40,17 @@ int main(int argc, char** argv)
 
 #endif // WL_PLATFORM_WINDOWS*/
 
-#include <iostream>
+import std;
 
-int main()
+#include "application.h"
+
+int main(int argc, char** argv)
 {
+	auto application = Application{ }
+
     // window title "Luma"
     // window width 1600
     // window height 900
-    
+
+	return 0;
 }

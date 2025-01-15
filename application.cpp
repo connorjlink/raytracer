@@ -1,8 +1,12 @@
-#include "Walnut/Application.h"
-#include "Walnut/EntryPoint.h"
-#include "Walnut/Image.h"
+import std;
 
-#include "Renderer.hpp"
+#include "application.h"
+
+namespace luma
+{
+
+}
+
 
 class RendererLayer : public Walnut::Layer
 {

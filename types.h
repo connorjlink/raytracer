@@ -1,10 +1,10 @@
-#ifndef GEO_TYPES_H
-#define GEO_TYPES_H
+#ifndef LUMA_TYPES_H
+#define LUMA_TYPES_H
 
 #include "float.h"
-#include "matrix.h"
+#include "base.h"
 
-namespace geo
+namespace cjl
 {
 	template<typename T>
 	using basic_mat2 = mat<2, 2, T>;

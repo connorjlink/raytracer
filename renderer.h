@@ -1,9 +1,6 @@
 #ifndef LUMA_RENDERER_H
 #define LUMA_RENDERER_H
 
-#include <cstdint>
-#include <vector>
-
 #include "vector.h"
 #include "camera.h"
 

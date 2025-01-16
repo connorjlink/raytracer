@@ -46,7 +46,7 @@ import std;
 
 int main(int argc, char** argv)
 {
-	auto application = Application{ }
+	auto application = luma::Application{ };
 
     // window title "Luma"
     // window width 1600

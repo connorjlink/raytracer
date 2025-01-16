@@ -22,7 +22,7 @@ namespace cjl
 		return out;
 	}
 
-	template<std::size_t M2 = 3, std::size_t M1 = 4, typename T = platform_type>
+	template<std::size_t M1 = 4, std::size_t M2 = 3, typename T = platform_type>
 		requires (M2 < M1)
 	constexpr vec<M2, T> truncate(const vec<M1, T>& vector)
 	{
@@ -36,7 +36,7 @@ namespace cjl
 		return out;
 	}
 
-	template<std::size_t M2 = 4, std::size_t M1, typename T = platform_type>
+	template<std::size_t M1 = 3, std::size_t M2 = 4, typename T = platform_type>
 		requires (M2 > M1)
 	constexpr vec<M2, T> extend(const vec<M1, T>& vector, T scalar = T{ 1 })
 	{

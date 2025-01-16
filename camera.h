@@ -1,11 +1,8 @@
 #ifndef LUMA_CAMERA_HPP
 #define LUMA_CAMERA_HPP
 
-#include <vector>
-
+#include "base.h"
 #include "types.h"
-#include "vector.h"
-#include "matrix.h"
 
 namespace luma
 {

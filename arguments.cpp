@@ -119,14 +119,24 @@ namespace luma
                     {
                         const auto[success, result] = parse_integer(value);
 
-                        if (success)
+                        if (!success)
                         {
-    
+							log(std::format("unrecognized image width `{}`", value));
+							continue;
                         }
+
+						_options.width = result;
                     } break;
 
                     case HEIGHT:
                     {
+						const auto [success, result] = parse_integer(value);
+
+						if (!success)
+						{
+							log(std::format(""))
+						}
+
                     } break;
 
                     case MODE:

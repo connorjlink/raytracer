@@ -1,6 +1,9 @@
 #ifndef LUMA_RANDOM_H
 #define LUMA_RANDOM_H
 
+#include "base.h"
+#include "types.h"
+
 namespace luma
 {
 	class Random
@@ -8,35 +11,14 @@ namespace luma
 	public:
 		static void init();
 
-		static std::uint32_t uint()
-		{
-			return _distribution(_engine);
-		}
+		static std::uint32_t uint();
+		static std::uint32_t uint(std::uint32_t min, std::uint32_t max);
 
-		static std::uint32_t UInt(std::uint32_t min, std::uint32_t max)
-		{
-			return min + (_distribution(_engine) % (max - min + 1));
-		}
+		static float real();
 
-		static float Float()
-		{
-			return static_cast<float>(_distribution(_engine)) / std::numeric_limits<uint32_t>::max();
-		}
-
-		static cjl::vec3 Vec3()
-		{
-			return cjl::vec3(Float(), Float(), Float());
-		}
-
-		static glm::vec3 Vec3(float min, float max)
-		{
-			return glm::vec3(Float() * (max - min) + min, Float() * (max - min) + min, Float() * (max - min) + min);
-		}
-
-		static cjl::vec3 InUnitSphere()
-		{
-			return cjl::normalize(Vec3(-1.0f, 1.0f));
-		}
+		static cjl::vec3 vec3();
+		static cjl::vec3 vec3(float, float);
+		static cjl::vec3 vec3_onsphere();
 
 	private:
 		static std::mt19937 _engine;

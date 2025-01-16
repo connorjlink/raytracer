@@ -1,4 +1,8 @@
+import std;
+
 #include "camera.h"
+#include "vector.h"
+#include "matrix.h"
 
 namespace luma
 {
@@ -13,7 +17,7 @@ namespace luma
 
 	bool Camera::OnUpdate(float ts) noexcept
 	{
-		cjl::vec2 mousePos = Input::GetMousePosition();
+		/*cjl::vec2 mousePos = Input::GetMousePosition();
 		cjl::vec2 delta = (mousePos - lastmouse) * 0.002f;
 		lastmouse = mousePos;
 
@@ -43,7 +47,7 @@ namespace luma
 
 		if (delta.x != .0f || delta.y != .0f)
 		{
-			constexpr auto rotation_speed = .3f;
+			static constexpr auto rotation_speed = .3f;
 
 			float pitchDelta = -delta.y * rotation_speed,
 					yawDelta = +delta.x * rotation_speed;
@@ -53,7 +57,7 @@ namespace luma
 			dir = cjl::rotate(q, dir);
 
 			moved = true;
-		}
+		}*/
 
 		if (moved)
 		{
@@ -72,7 +76,9 @@ namespace luma
 
 	void Camera::recompute_view(void) noexcept
 	{
-		view = cjl::look_at(pos, pos + dir, cjl::vec3{ 0, 1, 0 });
+		const auto at = cjl::add(pos, dir);
+
+		view = cjl::look_at(pos, at, cjl::vec3{ 0.f, 1.f, 0.f });
 		view_inverse = cjl::inverse(view);
 	}
 
@@ -84,14 +90,27 @@ namespace luma
 		{
 			for (auto x = 0; x < width; x++)
 			{
-				cjl::vec2 coord = { static_cast<float>(x) / width,
-									static_cast<float>(y) / height };
+				const auto one = cjl::broadcast<2>(1.f);
 
-				coord = coord * 2.0f - 1.0f;
+				cjl::vec2 coordinate = { static_cast<float>(x) / width,
+										 static_cast<float>(y) / height };
 
-				cjl::vec4 target = projection_inverse * cjl::vec4{ coord.x, coord.y, 1, 1 };
-				cjl::vec3 ray = cjl::vec3(iview * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0));
-				rays[y * width + x] = ray;
+				// renormalization
+				coordinate = cjl::scale(coordinate, 2.f);
+				coordinate = cjl::subtract(coordinate, one);
+
+				const auto extended = cjl::vec4{ coordinate[0], coordinate[1], 1.f, 1.f };
+				const auto target = cjl::apply(projection_inverse, extended);
+
+				const auto truncated = cjl::truncate(target);
+				const auto scalar = 1 / target[3];
+
+				const auto corrected = cjl::scale(truncated, scalar);
+				const auto normalized = cjl::normalize(corrected);
+				const auto padded = cjl::extend(normalized, 0.f);
+
+				const auto ray = cjl::apply(view_inverse, padded);
+				rays[y * width + x] = cjl::truncate(ray);
 			}
 		}
 	}

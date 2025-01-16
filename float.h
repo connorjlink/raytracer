@@ -15,7 +15,7 @@ namespace cjl
 	template<typename T = platform_type>
 	consteval T pi()
 	{
-		return T{ 3.14159265358979323846l };
+		return T{ 3.14159265358979323846L };
 	}
 
 	template<typename T = platform_type>

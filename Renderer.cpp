@@ -1,4 +1,8 @@
+import std;
+
 #include "renderer.h"
+#include "timer.h"
+#include "random.h"
 
 namespace
 {
@@ -6,27 +10,18 @@ namespace
 	{
 		std::uint32_t out = 0;
 
-		in *= 255;
+		in = cjl::scale(in, 255.f);
 
-		out |= (static_cast<int>(in.x) << 0);
-		out |= (static_cast<int>(in.y) << 8);
-		out |= (static_cast<int>(in.z) << 16);
-		out |= (static_cast<int>(in.a) << 24);
+		out |= (static_cast<int>(in[0]) << 0);
+		out |= (static_cast<int>(in[1]) << 8);
+		out |= (static_cast<int>(in[2]) << 16);
+		out |= (static_cast<int>(in[3]) << 24);
 
 		return out;
 	}
 }
 
-namespace
-{
-	constexpr auto max = std::numeric_limits<float>::max();
-	constexpr auto PI = 3.14159265f;
-
-	constexpr auto bounces = 2;
-	constexpr auto samples = 2;
-}
-
-namespace rt
+namespace luma
 {
 	Renderer::Renderer(void) noexcept
 		: camera(70.0f, 0.1f, 100.0f)
@@ -40,16 +35,18 @@ namespace rt
 
 	Intersection Renderer::trace_ray(const Ray& ray) noexcept
 	{
+		static constexpr auto max = std::numeric_limits<float>::max();
+
 		auto distance = max;
 
 		Intersection intersection{};
 
 		for (auto& sphere : spheres)
 		{
-			const auto diff = ray.pos - sphere.pos;
+			const auto diff = cjl::subtract(ray.pos, sphere.pos);
 
 			const auto a = cjl::dot(ray.dir, ray.dir);
-			const auto b = 2 * cjl::dot(dif, ray.dir);
+			const auto b = 2 * cjl::dot(diff, ray.dir);
 			const auto c = cjl::dot(diff, diff) - (sphere.radius * sphere.radius);
 
 			// descriminant
@@ -57,13 +54,16 @@ namespace rt
 
 			if (d > 0) [[unlikely]]
 			{
-				const auto t = (-b - cjl::sqrt(d)) / (2 * a);
-				const auto e = (-b + cjl::sqrt(d)) / (2 * a);
+				const auto t = (-b - std::sqrt(d)) / (2 * a);
+				const auto e = (-b + std::sqrt(d)) / (2 * a);
 
 				if (t > 0) [[likely]]
 				{
-					const auto hit = ray.pos + (ray.dir * t);
-					const auto normal = cjl::normalize(hit - sphere.pos);
+					const auto progress = cjl::scale(ray.dir, t);
+					const auto hit = cjl::add(ray.pos, progress);
+
+					const auto toward = cjl::subtract(hit, sphere.pos);
+					const auto normal = cjl::normalize(toward);
 
 					if (t < distance)
 					{
@@ -83,56 +83,77 @@ namespace rt
 		return intersection;
 	}
 
-	cjl::vec3 Renderer::PerPixel(std::uint32_t x, std::uint32_t y) noexcept
+	cjl::vec3 Renderer::render_pixel(std::uint32_t x, std::uint32_t y) noexcept
 	{
 		cjl::vec3 direct{}, indirect{}, result{};
 
 		auto dir = camera.rays[y * camera.width + x];
 		auto pos = camera.pos;
 
-		constexpr auto offset = .001f;
-		auto intersection = TraceRay(camera.pos, dir + Walnut::Random::Vec3(-offset, offset));
+		static constexpr auto offset = .001f;
+
+		const auto noise = Random::vec3(-offset, offset);
+		const auto dir_noised = cjl::add(dir, noise);
+
+		auto ray = Ray{ camera.pos, dir_noised };
+		auto intersection = trace_ray(ray);
 
 		const auto first = intersection;
 
 		auto multiplier = .5f;
 
-		for (auto bounce = 0; bounce < bounces; bounce++)
+		for (auto bounce = 0; bounce < _options.bounces; bounce++)
 		{
-			if (intersection == Miss())
+			if (intersection == miss())
 			{
-				const scjl::vec3 sky(.6f, .7f, .9f);
-				direct += (sky * multiplier);
+				const cjl::vec3 sky(.6f, .7f, .9f);
+				
+				const auto sky_contribution = cjl::scale(sky, multiplier);
+				direct = cjl::add(direct, sky_contribution);
 				break;
 			}
 
-			direct += (intersection.color * multiplier);
+			const auto hit_contribution = cjl::scale(intersection.color, multiplier);
+			direct = cjl::add(direct, hit_contribution);
+
 			multiplier *= .5f;
 
-			pos = intersection.pos + (intersection.normal * .001f);
+			const auto extruded = cjl::scale(intersection.normal, .001f);
+			pos = cjl::add(intersection.pos, extruded);
 
 			const auto ddelta = .5f * intersection.object->roughness;
 			dir = cjl::reflect(dir, intersection.normal + Walnut::Random::Vec3(-ddelta, ddelta));
 
-			intersection = TraceRay(camera.pos, dir + Walnut::Random::Vec3(-offset, offset));
+			intersection = trace_ray(camera.pos, dir + Walnut::Random::Vec3(-offset, offset));
 		}
 		
 		if (first != miss())
 		{
-			for (auto sample = 0; sample < samples; sample++)
+			for (auto sample = 0; sample < _options.samples; sample++)
 			{
-				auto ray = Walnut::Random::InUnitSphere();
+				auto dir = Random::vec3_onsphere();
 
-				if (cjl::dot(ray, first.normal) < 0)
-					ray = -ray;
+				if (cjl::dot(dir, first.normal) < 0)
+					dir = cjl::invert(dir);
 
-				const auto cast = TraceRay(first.pos, first.normal + ray);
+				const auto new_dir = cjl::add(first.normal, dir);
+				const auto ray = Ray{ first.pos, new_dir };
+				const auto cast = trace_ray(ray);
 
-				indirect += Walnut::Random::Float() * cast.color / (1 / (2 * PI));
+				const auto scalar = 1 / (2 * cjl::pi());
+				const auto scaled = cjl::scale(cast.color, scalar);
+
+				const auto contribution = cjl::scale(scaled, Random::real());
+				indirect = cjl::add(indirect, contribution);
 			}
 
-			indirect /= samples;
-			result = (direct + indirect) * first.color / PI;
+			const auto divisor = 1 / _options.samples;
+			indirect = cjl::scale(indirect, divisor);
+
+			const auto weight = cjl::scale(first.color, 1 / cjl::pi());
+			const auto unscaled = cjl::add(direct, indirect);
+
+			result = cjl::multiply(unscaled, weight);
 		}
 		
 		else
@@ -140,30 +161,25 @@ namespace rt
 			result = first.color;
 		}
 
-		auto tonemap = [&](cjl::vec3 in)
+		auto tonemap = [&](cjl::vec3& color)
 		{
 			auto func = [&](float in)
 			{
 				return 1 - std::exp(-in);
 			};
 
-			auto out = in;
-
-			out.x = func(out.x);
-			out.y = func(out.y);
-			out.z = func(out.z);
-
-			return out;
+			color[0] = func(color[0]);
+			color[1] = func(color[1]);
+			color[2] = func(color[2]);
 		};
 
-		result = tonemap(result);
-
+		tonemap(result);
 		return result;
 	}
 
 	void Renderer::Render(void) noexcept
 	{
-		Walnut::Timer timer;
+		cjl::Timer timer{};
 
 		auto width = image->GetWidth(),
 			 height = image->GetHeight();
@@ -174,10 +190,10 @@ namespace rt
 
 		if (camera.moved)
 		{
-			framecount = 1.f;
+			frame_count = 1.f;
 
-			delete[] accumulatedData;
-			accumulatedData = new cjl::vec3[width * height]();
+			delete[] accumulated_data;
+			accumulated_data = new cjl::vec3[width * height]();
 			camera.moved = false;
 		}
 
@@ -188,15 +204,15 @@ namespace rt
 			{
 				auto index = y * width + x;
 
-				accumulatedData[index] += PerPixel(x, y);
+				accumulated_data[index] += render_pixel(x, y);
 
-				imageData[index] = RGBA({ accumulatedData[index] / framecount, 1 });
+				image_data[index] = RGBA({ accumulated_data[index] / frame_count, 1 });
 			}
 		}
 
-		image->SetData(imageData);
-		frametime = timer.ElapsedMillis();
-		framecount += 1.f;
+		image->SetData(image_data);
+		frametime = timer.milliseconds();
+		frame_count += 1.f;
 	}
 
 	void Renderer::Resize(std::uint32_t width, std::uint32_t height) noexcept
@@ -217,12 +233,12 @@ namespace rt
 			image = new Walnut::Image(width, height, Walnut::ImageFormat::RGBA);
 		}
 
-		framecount = 1.f;
+		frame_count = 1.f;
 
-		delete[] imageData;
-		imageData = new uint32_t[width * height];
+		delete[] image_data;
+		image_data = new uint32_t[width * height];
 
-		delete[] accumulatedData;
-		accumulatedData = new cjl::vec3[width * height]();
+		delete[] accumulated_data;
+		accumulated_data = new cjl::vec3[width * height]();
 	}
 }

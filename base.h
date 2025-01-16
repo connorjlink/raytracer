@@ -8,7 +8,7 @@
 
 namespace cjl
 {
-	template<std::size_t M = 4, typename T = geo::platform_type>
+	template<std::size_t M = 4, typename T = cjl::platform_type>
 	class vec
 	{
 	private:

@@ -1,48 +1,20 @@
 #ifndef LUMA_TIMER_H
 #define LUMA_TIMER_H
 
-#include <iostream>
-#include <string>
-#include <chrono>
-
 namespace cjl
 {
 	class Timer
 	{
 	public:
-		Timer()
-		{
-			reset();
-		}
+		Timer() noexcept;
 
 	public:
-		void reset()
-		{
-			_start = std::chrono::high_resolution_clock::now();
-		}
-
-	private:
-		auto _delta()
-		{
-			const auto now = std::chrono::high_resolution_clock::now();
-			const auto diff = now - _start;
-			return diff;
-		}
-
+		void reset() noexcept;
+	
 	public:
-		float seconds()
-		{
-			const auto diff = _delta();
-			const auto result = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
-			return result;
-		}
-
-		float milliseconds()
-		{
-			const auto diff = _delta();
-			const auto result = std::chrono::duration_cast<std::chrono::milliseconds>(diff).count();
-			return result;
-		}
+		float seconds() noexcept;
+		float milliseconds() noexcept;
+		float nanoseconds() noexcept;
 
 	private:
 		std::chrono::time_point<std::chrono::high_resolution_clock> _start;
@@ -51,17 +23,9 @@ namespace cjl
 	class AutoTimer
 	{
 	public:
-		AutoTimer(const std::string& name)
-			: _name(name) 
-		{
-			_timer{};
-		}
+		AutoTimer(const std::string&) noexcept;
+		~AutoTimer() noexcept;
 
-		~AutoTimer()
-		{
-			float time = _timer.milliseconds();
-			std::println("[TIMER] {} - {}ms");
-		}
 	private:
 		std::string _name;
 		Timer _timer;

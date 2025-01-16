@@ -58,7 +58,7 @@ namespace luma
 
 		std::vector<Sphere> spheres{ s, t, a };
 
-		glm::vec3 light{ 0, -1, 0 };
+		cjl::vec3 light{ 0, -1, 0 };
 
 	public:
 		Renderer(void) noexcept;
@@ -67,7 +67,7 @@ namespace luma
 	private:
 		Intersection miss(void) noexcept;
 		Intersection trace_ray(const Ray&) noexcept;
-		glm::vec3 render_pixel(std::uint32_t, std::uint32_t) noexcept;
+		cjl::vec3 render_pixel(std::uint32_t, std::uint32_t) noexcept;
 	};
 }
 

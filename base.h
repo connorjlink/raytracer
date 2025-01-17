@@ -12,6 +12,11 @@ namespace cjl
 		std::array<T, M> _data;
 
 	public:
+		vec()
+		{
+			_data = {};
+		}
+
 		template<typename... Ts>
 		vec(Ts... ts)
 		{
@@ -55,14 +60,28 @@ namespace cjl
 		std::array<std::array<T, N>, M> _data;
 
 	public:
-		template<typename... Ts>
-		mat(Ts&&... ts)
+		mat()
 		{
-			static_assert(sizeof...(ts) == M, "Rowcount != M");
-
-			std::array<T, N> temp = { std::forward<Ts>(ts)... };
-			std::copy(temp.begin(), temp.end(), _data.begin());
+			_data = {};
 		}
+
+		mat(const std::array<std::array<T, N>, M>& data)
+		{
+			_data = data;
+		}
+
+		//template<typename... Ts>
+		//mat(Ts&&... ts)
+		//{
+		//	// const std::array<T, N>
+		//	auto i = 0;
+
+		//	([&]()
+		//	{
+		//		_data[i] = ts;
+		//		++i;
+		//	}(), ...);
+		//}
 
 	public:
 		inline constexpr auto& operator[](std::size_t i)

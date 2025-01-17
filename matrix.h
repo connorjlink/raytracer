@@ -220,12 +220,12 @@ namespace cjl
 		const auto yaxis = normalize(cross(zaxis, xaxis));
 
 		return mat<M, M, T>
-		{
-			xaxis[0], yaxis[0], zaxis[0], 0,
-				xaxis[1], yaxis[1], zaxis[1], 0,
-				xaxis[2], yaxis[2], zaxis[2], 0,
-				-dot(xaxis, eye), -dot(yaxis, eye), -dot(zaxis, eye), 1,
-		};
+		{ std::array<std::array<T, M>, M>{
+			std::array<T, M>{ xaxis[0],         yaxis[0],         zaxis[0],        0, },
+			std::array<T, M>{ xaxis[1],         yaxis[1],         zaxis[1],        0, },
+			std::array<T, M>{ xaxis[2],         yaxis[2],         zaxis[2],        0, },
+			std::array<T, M>{-dot(xaxis, eye), -dot(yaxis, eye), -dot(zaxis, eye), 1, },
+		} };
 	}
 }
 

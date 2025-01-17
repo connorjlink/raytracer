@@ -66,6 +66,7 @@ namespace
 		WIDTH,
 		HEIGHT,
 		MODE,
+		SAMPLES,
 		BOUNCES,
 	};
 
@@ -75,6 +76,7 @@ namespace
 		{ "height", ArgumentType::HEIGHT },
 		{ "mode", ArgumentType::MODE },
 		{ "bounces", ArgumentType::BOUNCES },
+		{ "samples", ArgumentType::SAMPLES },
 	};
 }
 
@@ -130,82 +132,57 @@ namespace luma
 
 					case HEIGHT:
 					{
+						const auto[success, result] = parse_integer(value);
+
+						if (!success)
+						{
+							log(std::format("unrecognized image height `{}`", value));
+							continue;
+						}
+
+						_options.height = result;
+					} break;
+
+					case SAMPLES:
+					{
 						const auto [success, result] = parse_integer(value);
 
 						if (!success)
 						{
-							log(std::format(""))
+							log(std::format("unrecognized image samples `{}`", value));
+							continue;
 						}
 
+						_options.samples = result;
+					} break;
+
+					case BOUNCES:
+					{
+						const auto[success, result] = parse_integer(value);
+
+						if (!success)
+						{
+							log(std::format("unrecognized image bounces `{}`", value));
+							continue;
+						}
+
+						_options.bounces = result;
 					} break;
 
 					case MODE:
 					{
-						if (!_mode_map.contains(value))
+						if (!_render_mode_map.contains(value))
 						{
 							log(std::format("unrecognized mode `{}`", value));
 							continue;
 						}
 
-						_options->_mode = _mode_map.at(value);
+						_options.mode = _render_mode_map.at(value);
 					} break;
 
-					case BOUNCES:
+					default:
 					{
-					} break;
-
-					case ARCHITECTURE:
-					{
-						if (!_architecture_map.contains(value))
-						{
-							_error_reporter->post_warning(std::format("unrecognized architecture type `{}`", value), NULL_TOKEN);
-							continue;
-						}
-
-						_options->_architecture = _architecture_map.at(value);
-					} break;
-
-					case VERBOSITY:
-					{
-						if (!_verbosity_type_map.contains(value))
-						{
-							_error_reporter->post_warning(std::format("unrecognized verbosity type `{}`", value), NULL_TOKEN);
-							continue;
-						}
-
-						_options->_verbosity = _verbosity_type_map.at(value);
-					} break;
-
-					case EXECUTION:
-					{
-						if (!_execution_map.contains(value))
-						{
-							_error_reporter->post_warning(std::format("unrecognized execution type `{}`", value), NULL_TOKEN);
-							continue;
-						}
-
-						_options->_execution = _execution_map.at(value);
-					} break;
-
-					case OUTPUT:
-					{
-						if (value != "raw")
-						{
-							_error_reporter->post_warning(std::format("unrecognized output type `{}`", value), NULL_TOKEN);
-							continue;
-						}
-					} break;
-
-					case OPTIMIZATION:
-					{
-						if (!_optimization_map.contains(value))
-						{
-							_error_reporter->post_warning(std::format("unrecognized optimization type `{}`", value), NULL_TOKEN);
-							continue;
-						}
-
-						auto flag = _optimization_map.at(value);
-						_options->_optimization |= flag;
+						log(std::format("unrecognized option `{}`", option_string));
 					} break;
 				}
 			}
@@ -213,7 +190,7 @@ namespace luma
 			// parsing a source code filepath
 			else
 			{
-				_filepaths.emplace_back(argument);
+				log(std::format("invalid argument `{}`", argument));
 			}
 		}
 	}

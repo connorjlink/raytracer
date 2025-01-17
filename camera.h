@@ -9,7 +9,7 @@ namespace luma
 	class Camera
 	{
 	public:
-		Camera(float, float, float) noexcept;
+		Camera(float, float, float, std::uint32_t, std::uint32_t) noexcept;
 		bool update(float) noexcept;
 
 	private:

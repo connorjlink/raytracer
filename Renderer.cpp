@@ -2,6 +2,7 @@ import std;
 
 #include "renderer.h"
 #include "arguments.h"
+#include "image.h"
 #include "timer.h"
 #include "random.h"
 
@@ -20,12 +21,25 @@ namespace
 
 		return out;
 	}
+
+	std::uint32_t RGB(cjl::vec3 in) noexcept
+	{
+		std::uint32_t out = 0;
+
+		in = cjl::scale(in, 255.f);
+
+		out |= (static_cast<int>(in[0]) << 0);
+		out |= (static_cast<int>(in[1]) << 8);
+		out |= (static_cast<int>(in[2]) << 16);
+
+		return out;
+	}
 }
 
 namespace luma
 {
 	Renderer::Renderer(void) noexcept
-		: camera(70.0f, 0.1f, 100.0f)
+		: camera(70.0f, 0.1f, 100.0f, _options.width, _options.height)
 	{
 	}
 
@@ -103,7 +117,7 @@ namespace luma
 
 		auto multiplier = .5f;
 
-		for (auto bounce = 0; bounce < _options.bounces; bounce++)
+		for (auto bounce = 0u; bounce < _options.bounces; bounce++)
 		{
 			if (intersection == miss())
 			{
@@ -136,7 +150,7 @@ namespace luma
 
 		if (first != miss())
 		{
-			for (auto sample = 0; sample < _options.samples; sample++)
+			for (auto sample = 0u; sample < _options.samples; sample++)
 			{
 				auto dir = Random::vec3_onsphere();
 
@@ -197,15 +211,17 @@ namespace luma
 		{
 			frame_count = 1.f;
 
+			image_data = new std::uint32_t[width * height]();
+
 			delete[] accumulated_data;
 			accumulated_data = new cjl::vec3[width * height]();
 			camera.moved = false;
 		}
 
-	#pragma omp parallel for
-		for (auto y = 0; y < height; ++y)
+	//#pragma omp parallel for
+		for (auto y = 0u; y < height; ++y)
 		{
-			for (auto x = 0; x < width; ++x)
+			for (auto x = 0u; x < width; ++x)
 			{
 				auto index = y * width + x;
 
@@ -214,11 +230,15 @@ namespace luma
 				auto& data = accumulated_data[index];
 				data = cjl::add(data, result);
 
-				image_data[index] = RGBA({ accumulated_data[index] / frame_count, 1 });
+				const auto mean = cjl::scale(accumulated_data[index], 1 / frame_count);
+				image_data[index] = RGB(mean);
 			}
 		}
 
-		image->paint(image_data);
+		Image image{ width, height };
+		image.shadow_from(image_data);
+		image.export_to("output.ppm");
+
 		frametime = timer.milliseconds();
 		frame_count += 1.f;
 	}

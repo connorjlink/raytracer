@@ -6,13 +6,15 @@ import std;
 
 namespace luma
 {
-	Camera::Camera(float vfov, float nearclip, float farclip) noexcept
-		: fov(vfov), nearclip(nearclip), farclip(farclip)
+	Camera::Camera(float fov, float nearclip, float farclip, std::uint32_t width, std::uint32_t height) noexcept
+		: fov(fov), nearclip(nearclip), farclip(farclip), width{ width }, height{ height }
 	{
 		dir = cjl::vec3{ 0, 0, -1 };
 		pos = cjl::vec3{ 0, 0, 6 };
 
        	projection = projection_inverse = view = view_inverse = cjl::identity();
+
+		moved = true;
 	}
 
 	bool Camera::update(float ts) noexcept
@@ -78,7 +80,7 @@ namespace luma
 	{
 		const auto at = cjl::add(pos, dir);
 
-		view = cjl::look_at(pos, at, cjl::vec3{ 0.f, 1.f, 0.f });
+		view = cjl::lookat(pos, at, cjl::vec3{ 0.f, 1.f, 0.f });
 		view_inverse = cjl::inverse(view);
 	}
 
@@ -86,9 +88,9 @@ namespace luma
 	{
 		rays.resize(width * height);
 
-		for (auto y = 0; y < height; y++)
+		for (auto y = 0u; y < height; y++)
 		{
-			for (auto x = 0; x < width; x++)
+			for (auto x = 0u; x < width; x++)
 			{
 				const auto one = cjl::broadcast<2>(1.f);
 

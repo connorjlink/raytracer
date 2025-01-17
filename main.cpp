@@ -42,11 +42,20 @@ int main(int argc, char** argv)
 
 import std;
 
+#include "arguments.h"
 #include "application.h"
+#include "renderer.h"
+
+luma::Options luma::_options;
 
 int main(int argc, char** argv)
 {
-	auto application = luma::Application{ };
+	auto arguments = luma::Arguments{};
+	arguments.parse(argc, argv);
+
+	auto application = luma::Application{};
+	auto renderer = luma::Renderer{};
+	renderer.render();
 
     // window title "Luma"
     // window width 1600

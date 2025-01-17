@@ -9,6 +9,12 @@ namespace luma
 		PATHTRACE,
 	};
 
+	static const std::unordered_map<std::string, RenderMode> _render_mode_map
+	{
+		{ "raytrace", RenderMode::RAYTRACE },
+		{ "pathtrace", RenderMode::PATHTRACE },
+	};
+
 	struct Options
 	{
 		std::uint32_t width, height;
@@ -16,24 +22,11 @@ namespace luma
 		RenderMode mode;
 	};
 
-	inline static Options _options{};
+	extern Options _options;
 
 	class Arguments
 	{
 	private:
-		std::vector<std::string> _filepaths;
-
-	public:
-		const decltype(_filepaths)& files() const
-		{
-			return _filepaths;
-		}
-
-	public:
-		Arguments()
-		{
-		}
-
 	public:
 		void parse(int, char**);
 	};

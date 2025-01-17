@@ -13,7 +13,8 @@ namespace luma
 		Image(std::uint32_t, std::uint32_t) noexcept;
 
 	public:
-		void export_to(const std::string&) const noexcept;
+		void shadow_from(std::uint32_t*) noexcept;
+		void export_to(const std::string&) noexcept;
 	};
 }
 

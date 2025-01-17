@@ -15,7 +15,7 @@ namespace luma
        	projection = projection_inverse = view = view_inverse = cjl::identity();
 	}
 
-	bool Camera::OnUpdate(float ts) noexcept
+	bool Camera::update(float ts) noexcept
 	{
 		/*cjl::vec2 mousePos = Input::GetMousePosition();
 		cjl::vec2 delta = (mousePos - lastmouse) * 0.002f;

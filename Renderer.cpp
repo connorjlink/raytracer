@@ -1,6 +1,7 @@
 import std;
 
 #include "renderer.h"
+#include "arguments.h"
 #include "timer.h"
 #include "random.h"
 
@@ -121,12 +122,18 @@ namespace luma
 			const auto extruded = cjl::scale(intersection.normal, .001f);
 			pos = cjl::add(intersection.pos, extruded);
 
-			const auto ddelta = .5f * intersection.object->roughness;
-			dir = cjl::reflect(dir, intersection.normal + Walnut::Random::Vec3(-ddelta, ddelta));
+			const auto gain = .5f * intersection.object->roughness;
+			const auto roughness_noise = Random::vec3(-gain, gain);
+			const auto normal = cjl::add(intersection.normal, roughness_noise);
+			const auto dir_noise = Random::vec3(-offset, offset);
 
-			intersection = trace_ray(camera.pos, dir + Walnut::Random::Vec3(-offset, offset));
+			dir = cjl::reflect(dir, normal);
+			dir = cjl::add(dir, dir_noise);
+
+			const auto ray = Ray{ camera.pos, dir };
+			intersection = trace_ray(ray);
 		}
-		
+
 		if (first != miss())
 		{
 			for (auto sample = 0; sample < _options.samples; sample++)
@@ -147,7 +154,7 @@ namespace luma
 				indirect = cjl::add(indirect, contribution);
 			}
 
-			const auto divisor = 1 / _options.samples;
+			const auto divisor = 1.f / _options.samples;
 			indirect = cjl::scale(indirect, divisor);
 
 			const auto weight = cjl::scale(first.color, 1 / cjl::pi());
@@ -177,16 +184,14 @@ namespace luma
 		return result;
 	}
 
-	void Renderer::Render(void) noexcept
+	void Renderer::render(void) noexcept
 	{
 		cjl::Timer timer{};
 
-		auto width = image->GetWidth(),
-			 height = image->GetHeight();
+		const auto& width = _options.width;
+		const auto& height = _options.height;
 
-		Resize(width, height);
-		camera.OnResize(width, height);
-		camera.OnUpdate(frametime);
+		camera.update(frametime);
 
 		if (camera.moved)
 		{
@@ -197,48 +202,24 @@ namespace luma
 			camera.moved = false;
 		}
 
-		#pragma omp parallel for
+	#pragma omp parallel for
 		for (auto y = 0; y < height; ++y)
 		{
 			for (auto x = 0; x < width; ++x)
 			{
 				auto index = y * width + x;
 
-				accumulated_data[index] += render_pixel(x, y);
+				const auto result = render_pixel(x, y);
+				
+				auto& data = accumulated_data[index];
+				data = cjl::add(data, result);
 
 				image_data[index] = RGBA({ accumulated_data[index] / frame_count, 1 });
 			}
 		}
 
-		image->SetData(image_data);
+		image->paint(image_data);
 		frametime = timer.milliseconds();
 		frame_count += 1.f;
-	}
-
-	void Renderer::Resize(std::uint32_t width, std::uint32_t height) noexcept
-	{
-		if (image != nullptr)
-		{
-			if (image->GetWidth() == width &&
-				image->GetHeight() == height)
-			{
-				return;
-			}
-
-			image->Resize(width, height);
-		}
-
-		else
-		{
-			image = new Walnut::Image(width, height, Walnut::ImageFormat::RGBA);
-		}
-
-		frame_count = 1.f;
-
-		delete[] image_data;
-		image_data = new uint32_t[width * height];
-
-		delete[] accumulated_data;
-		accumulated_data = new cjl::vec3[width * height]();
 	}
 }

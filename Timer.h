@@ -12,9 +12,9 @@ namespace cjl
 		void reset() noexcept;
 	
 	public:
-		float seconds() noexcept;
-		float milliseconds() noexcept;
-		float nanoseconds() noexcept;
+		float seconds() const noexcept;
+		float milliseconds() const noexcept;
+		float nanoseconds() const noexcept;
 
 	private:
 		std::chrono::time_point<std::chrono::high_resolution_clock> _start;

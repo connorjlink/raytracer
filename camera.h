@@ -10,7 +10,7 @@ namespace luma
 	{
 	public:
 		Camera(float, float, float) noexcept;
-		bool OnUpdate(float) noexcept;
+		bool update(float) noexcept;
 
 	private:
 		void recompute_projection(void) noexcept;

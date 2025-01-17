@@ -235,6 +235,8 @@
     <ClCompile Include="application.cpp" />
     <ClCompile Include="arguments.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="image.cpp" />
+    <ClCompile Include="log.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="random.cpp" />
     <ClCompile Include="renderer.cpp" />
@@ -246,11 +248,14 @@
     <ClInclude Include="base.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="float.h" />
+    <ClInclude Include="image.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="random.h" />
     <ClInclude Include="renderer.h" />
-    <ClInclude Include="stb_image.h" />
+    <None Include="stb_image.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
     <ClInclude Include="timer.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="vector.h" />

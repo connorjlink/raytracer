@@ -3,25 +3,40 @@
 
 namespace luma
 {
-    class Arguments
-    {
-    private:
-        std::vector<std::string> _filepaths;
+	enum class RenderMode
+	{
+		RAYTRACE,
+		PATHTRACE,
+	};
 
-    public:
-        const decltype(_filepaths)& files() const
-        {
-            return _filepaths;
-        }
+	struct Options
+	{
+		std::uint32_t width, height;
+		std::uint32_t samples, bounces;
+		RenderMode mode;
+	};
 
-    public:
-        Arguments()
-        {
-        }
+	inline static Options _options{};
 
-    public:
-        void parse(int, char**);
-    };
+	class Arguments
+	{
+	private:
+		std::vector<std::string> _filepaths;
+
+	public:
+		const decltype(_filepaths)& files() const
+		{
+			return _filepaths;
+		}
+
+	public:
+		Arguments()
+		{
+		}
+
+	public:
+		void parse(int, char**);
+	};
 }
 
 #endif

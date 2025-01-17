@@ -34,12 +34,12 @@ namespace luma
 	class Renderer
 	{
 	public:
-		bool accumulate = true;
 		float frametime = 0.f;
+		float frame_count = 1.f;
 		
+		bool accumulate = true;
 		std::uint32_t* image_data = nullptr;
 		cjl::vec3* accumulated_data = nullptr;
-		float frame_count = 1.f;
 
 		Camera camera;
 
@@ -62,7 +62,7 @@ namespace luma
 
 	public:
 		Renderer(void) noexcept;
-		void Render(void) noexcept;
+		void render(void) noexcept;
 
 	private:
 		Intersection miss(void) noexcept;

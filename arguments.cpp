@@ -40,42 +40,42 @@ namespace
 		return arguments;
 	}
 
-    struct ProcessResult
-    {
-        bool success;
-        int result;
-    };
+	struct ProcessResult
+	{
+		bool success;
+		int result;
+	};
 
-    ProcessResult parse_integer(const std::string& input)
-    {
-	    int result = 0;
-	    const char* start = input.data();
-	    const char* end = start + input.size();
+	ProcessResult parse_integer(const std::string& input)
+	{
+		int result = 0;
+		const char* start = input.data();
+		const char* end = start + input.size();
 
-	    auto [ptr, ec] = std::from_chars(start, end, result);
+		auto [ptr, ec] = std::from_chars(start, end, result);
 
-	    bool success = (ec == std::errc() && ptr == end);
-	    return { success, result };
+		bool success = (ec == std::errc() && ptr == end);
+		return { success, result };
 	}
 }
 
 namespace
 {
-    enum class ArgumentType
-    {
-        WIDTH,
-        HEIGHT,
-        MODE,
-        BOUNCES,
-    };
+	enum class ArgumentType
+	{
+		WIDTH,
+		HEIGHT,
+		MODE,
+		BOUNCES,
+	};
 
-    static const std::unordered_map<std::string, ArgumentType> _arguments_map
-    {
-        { "width", ArgumentType::WIDTH },
-        { "height", ArgumentType::HEIGHT },
-        { "mode", ArgumentType::MODE },
-        { "bounces", ArgumentType::BOUNCES },
-    };
+	static const std::unordered_map<std::string, ArgumentType> _arguments_map
+	{
+		{ "width", ArgumentType::WIDTH },
+		{ "height", ArgumentType::HEIGHT },
+		{ "mode", ArgumentType::MODE },
+		{ "bounces", ArgumentType::BOUNCES },
+	};
 }
 
 namespace luma
@@ -105,7 +105,7 @@ namespace luma
 
 				if (!_arguments_map.contains(option_string))
 				{
-                    log(std::format("unrecognized option `{}`", option_string));
+					log(std::format("unrecognized option `{}`", option_string));
 					continue;
 				}
 
@@ -115,21 +115,21 @@ namespace luma
 				using enum ArgumentType;
 				switch (option)
 				{
-                    case WIDTH:
-                    {
-                        const auto[success, result] = parse_integer(value);
+					case WIDTH:
+					{
+						const auto[success, result] = parse_integer(value);
 
-                        if (!success)
-                        {
+						if (!success)
+						{
 							log(std::format("unrecognized image width `{}`", value));
 							continue;
-                        }
+						}
 
 						_options.width = result;
-                    } break;
+					} break;
 
-                    case HEIGHT:
-                    {
+					case HEIGHT:
+					{
 						const auto [success, result] = parse_integer(value);
 
 						if (!success)
@@ -137,22 +137,22 @@ namespace luma
 							log(std::format(""))
 						}
 
-                    } break;
+					} break;
 
-                    case MODE:
-                    {
-                        if (!_mode_map.contains(value))
-                        {
-                            log(std::format("unrecognized mode `{}`", value));
-                            continue;
-                        }
+					case MODE:
+					{
+						if (!_mode_map.contains(value))
+						{
+							log(std::format("unrecognized mode `{}`", value));
+							continue;
+						}
 
-                        _options->_mode = _mode_map.at(value);
-                    } break;
+						_options->_mode = _mode_map.at(value);
+					} break;
 
-                    case BOUNCES:
-                    {
-                    } break;
+					case BOUNCES:
+					{
+					} break;
 
 					case ARCHITECTURE:
 					{

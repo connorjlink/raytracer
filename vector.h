@@ -1,9 +1,6 @@
 #ifndef LUMA_VECTOR_H
 #define LUMA_VECTOR_H
 
-#include <algorithm>
-#include <numeric>
-
 #include "base.h"
 #include "matrix.h"
 
@@ -81,7 +78,7 @@ namespace cjl
 	constexpr vec<M, T> _accumulate(const vec<M, T>& vector1, const vec<M, T>& vector2)
 	{
 		vec<M, T> out{};
-
+		
 		for (auto i = 0; i < M; i++)
 		{
 			out[i] = U{}(vector1[i], vector2[i]);
@@ -248,6 +245,15 @@ namespace cjl
 		const auto backward = _backward_diagonals(matrix);
 
 		return subtract(forward, backward);
+	}
+
+	template<std::size_t M = 3, typename T = platform_type>
+	constexpr vec<M, T> reflect(const vec<M, T>& vector, const vec<M, T>& normal)
+	{
+		const auto product = dot(vector, normal);
+		const auto rescaled = scale(normal, product);
+
+		return subtract(vector, rescaled);
 	}
 }
 

@@ -1,9 +1,6 @@
 #ifndef LUMA_BASE_H
 #define LUMA_BASE_H
 
-#include <algorithm>
-#include <array>
-
 #include "float.h"
 
 namespace cjl

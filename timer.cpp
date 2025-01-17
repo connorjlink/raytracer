@@ -14,7 +14,7 @@ namespace cjl
 		_start = std::chrono::high_resolution_clock::now();
 	}
 
-	float Timer::seconds() noexcept
+	float Timer::seconds() const noexcept
 	{
 		const auto now = std::chrono::high_resolution_clock::now();
 		const auto diff = now - _start;
@@ -22,7 +22,7 @@ namespace cjl
 		return result;
 	}
 
-	float Timer::milliseconds() noexcept
+	float Timer::milliseconds() const noexcept
 	{
 		const auto now = std::chrono::high_resolution_clock::now();
 		const auto diff = now - _start;
@@ -30,7 +30,7 @@ namespace cjl
 		return result;
 	}
 
-	float Timer::nanoseconds() noexcept
+	float Timer::nanoseconds() const noexcept
 	{
 		const auto now = std::chrono::high_resolution_clock::now();
 		const auto diff = now - _start;

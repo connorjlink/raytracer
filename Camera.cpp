@@ -1,8 +1,10 @@
-import std;
+﻿import std;
 
 #include "camera.h"
 #include "vector.h"
 #include "matrix.h"
+
+#include "olcPixelGameEngine.h"
 
 namespace luma
 {
@@ -10,56 +12,56 @@ namespace luma
 		: fov(fov), nearclip(nearclip), farclip(farclip), width{ width }, height{ height }
 	{
 		dir = cjl::vec3{ 0, 0, -1 };
-		pos = cjl::vec3{ 0, 0, 6 };
+		pos = cjl::vec3{ 0, 0, 0 };
 
        	projection = projection_inverse = view = view_inverse = cjl::identity();
 
 		moved = true;
 	}
 
-	bool Camera::update(float ts) noexcept
+	bool Camera::update(float ts, olc::PixelGameEngine& pge) noexcept
 	{
-		/*cjl::vec2 mousePos = Input::GetMousePosition();
-		cjl::vec2 delta = (mousePos - lastmouse) * 0.002f;
-		lastmouse = mousePos;
+		static constexpr auto movement_speed = .01f;
+		static constexpr auto look_speed = .002f;
+		static constexpr auto rotation_speed = .3f;
 
-		if (!Input::IsMouseButtonDown(MouseButton::Right))
+		const auto mouse_pos = pge.GetMousePos();
+		const auto Δmouse = (mouse_pos - lastmouse) * look_speed;
+		lastmouse = mouse_pos;
+
+		/*if (!Input::IsMouseButtonDown(MouseButton::Right))
 		{
 			Input::SetCursorMode(CursorMode::Normal);
 			return false;
 		}
 
-		Input::SetCursorMode(CursorMode::Locked);
+		Input::SetCursorMode(CursorMode::Locked);*/
 
 		moved = false;
 
-		constexpr cjl::vec3 up{ 0.0f, 1.0f, 0.0f };
-		cjl::vec3 right = cjl::cross(dir, up);
+		constexpr cjl::vec3 up{ 0.f, 1.f, 0.f };
+		const cjl::vec3 right = cjl::cross(dir, up);
 
-		constexpr float speed = .01f;
+			 if (pge.GetKey(olc::Key::W).bHeld) { pos += dir * movement_speed * ts; moved = true; }
+		else if (pge.GetKey(olc::Key::S).bHeld) { pos -= dir * movement_speed * ts; moved = true; }
 
-			 if (Input::IsKeyDown(KeyCode::W)) { pos += dir * speed * ts; moved = true; }
-		else if (Input::IsKeyDown(KeyCode::S)) { pos -= dir * speed * ts; moved = true; }
+			 if (pge.GetKey(olc::Key::A).bHeld) { pos -= right * movement_speed * ts; moved = true; }
+		else if (pge.GetKey(olc::Key::D).bHeld) { pos += right * movement_speed * ts; moved = true; }
 
-			 if (Input::IsKeyDown(KeyCode::A)) { pos -= right * speed * ts; moved = true; }
-		else if (Input::IsKeyDown(KeyCode::D)) { pos += right * speed * ts; moved = true; }
+			 if (pge.GetKey(olc::Key::Q).bHeld) { pos -= up * movement_speed * ts; moved = true; }
+		else if (pge.GetKey(olc::Key::E).bHeld) { pos += up * movement_speed * ts; moved = true; }
 
-			 if (Input::IsKeyDown(KeyCode::Q)) { pos -= up * speed * ts; moved = true; }
-		else if (Input::IsKeyDown(KeyCode::E)) { pos += up * speed * ts; moved = true; }
-
-		if (delta.x != .0f || delta.y != .0f)
+		if (Δmouse.x != .0f || Δmouse.y != .0f)
 		{
-			static constexpr auto rotation_speed = .3f;
+			float Δpitch = -Δmouse.y * rotation_speed,
+				  Δyaw = +Δmouse.x * rotation_speed;
 
-			float pitchDelta = -delta.y * rotation_speed,
-					yawDelta = +delta.x * rotation_speed;
-
-			cjl::quat q = cjl::normalize(cjl::cross(cjl::angleAxis(-pitchDelta, right),
-				cjl::angleAxis(-yawDelta, cjl::vec3{ 0, 1, 0 })));
-			dir = cjl::rotate(q, dir);
+			//cjl::quat q = cjl::normalize(cjl::cross(cjl::angleAxis(-pitchDelta, right),
+			//	cjl::angleAxis(-yawDelta, cjl::vec3{ 0, 1, 0 })));
+			//dir = cjl::rotate(q, dir);
 
 			moved = true;
-		}*/
+		}
 
 		if (moved)
 		{

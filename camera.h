@@ -4,13 +4,18 @@
 #include "base.h"
 #include "types.h"
 
+namespace olc
+{
+	class PixelGameEngine;
+}
+
 namespace luma
 {
 	class Camera
 	{
 	public:
 		Camera(float, float, float, std::uint32_t, std::uint32_t) noexcept;
-		bool update(float) noexcept;
+		bool update(float, olc::PixelGameEngine&) noexcept;
 
 	private:
 		void recompute_projection(void) noexcept;

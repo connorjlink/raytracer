@@ -5,9 +5,18 @@ import std;
 
 namespace luma
 {
-	Image::Image(std::uint32_t width, std::uint32_t height) noexcept
-		: _width{ width }, _height{ height }, _data{ nullptr }
+	Image::Image(std::int32_t width, std::int32_t height, bool allocate) noexcept
+		: _width{ width }, _height{ height }
 	{
+		if (allocate)
+		{
+			_data = new std::uint32_t[width * height];
+		}
+
+		else
+		{
+			_data = nullptr;
+		}
 	}
 
 	void Image::shadow_from(std::uint32_t* data) noexcept
@@ -27,9 +36,9 @@ namespace luma
 				const auto coordinate = y * _width + x;
 				const auto data = _data[coordinate];
 
-				const auto red = data & 0xFF0000 >> 16;
-				const auto green = data & 0xFF00 >> 8;
-				const auto blue = data & 0xFF >> 00;
+				const auto red = (data & 0xFF0000) >> 16;
+				const auto green = (data & 0xFF00) >> 8;
+				const auto blue = (data & 0xFF) >> 00;
 
 				ppm += std::format("{} {} {}  ", red, green, blue);
 			}

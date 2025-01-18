@@ -28,9 +28,9 @@ namespace
 
 		in = cjl::scale(in, 255.f);
 
-		out |= (static_cast<int>(in[0]) << 0);
+		out |= (static_cast<int>(in[0]) << 16);
 		out |= (static_cast<int>(in[1]) << 8);
-		out |= (static_cast<int>(in[2]) << 16);
+		out |= (static_cast<int>(in[2]) << 0);
 
 		return out;
 	}
@@ -198,20 +198,18 @@ namespace luma
 		return result;
 	}
 
-	void Renderer::render(void) noexcept
+	void Renderer::render_to(std::uint32_t* target) noexcept
 	{
 		cjl::Timer timer{};
 
-		const auto& width = _options.width;
-		const auto& height = _options.height;
+		const auto width = _options.width;
+		const auto height = _options.height;
 
 		camera.update(frametime);
 
 		if (camera.moved)
 		{
 			frame_count = 1.f;
-
-			image_data = new std::uint32_t[width * height]();
 
 			delete[] accumulated_data;
 			accumulated_data = new cjl::vec3[width * height]();
@@ -223,7 +221,7 @@ namespace luma
 		{
 			for (auto x = 0u; x < width; ++x)
 			{
-				auto index = y * width + x;
+				auto index = (y * width) + x;
 
 				const auto result = render_pixel(x, y);
 				
@@ -231,13 +229,9 @@ namespace luma
 				data = cjl::add(data, result);
 
 				const auto mean = cjl::scale(accumulated_data[index], 1 / frame_count);
-				image_data[index] = RGB(mean);
+				target[index] = RGB(mean);
 			}
 		}
-
-		Image image{ width, height };
-		image.shadow_from(image_data);
-		image.export_to("output.ppm");
 
 		frametime = timer.milliseconds();
 		frame_count += 1.f;

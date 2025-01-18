@@ -38,14 +38,13 @@ namespace luma
 		float frame_count = 1.f;
 		
 		bool accumulate = true;
-		std::uint32_t* image_data = nullptr;
 		cjl::vec3* accumulated_data = nullptr;
 
 		Camera camera;
 
 		Intersection* closest = nullptr;
 
-		Sphere s{ { 0, -1, 0 }, 1.0f, { 0, 0, 1 }, 1, 0 };
+		Sphere s{ { 0, 0, -10 }, 1.0f, { 1, 0, 0 }, 1, 0 };
 
 		Sphere a{ { 0, 1000, 0}, 1000, { .6, .6, .6 }, 1, 0 };
 		Sphere b{ { 1003, 0, 0}, 1000, { .6, .6, .6 }, 0, 1 };
@@ -56,13 +55,13 @@ namespace luma
 
 		Sphere t{ { 2, -1, 0 }, 0.5f, { 0, 1, 0 }, 1, 0 };
 
-		std::vector<Sphere> spheres{ s, t, a };
+		std::vector<Sphere> spheres{ s };
 
 		cjl::vec3 light{ 0, -1, 0 };
 
 	public:
 		Renderer(void) noexcept;
-		void render(void) noexcept;
+		void render_to(std::uint32_t*) noexcept;
 
 	private:
 		Intersection miss(void) noexcept;

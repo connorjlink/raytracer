@@ -175,7 +175,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-      <EnableEnhancedInstructionSet>CPUExtensionRequirementsARMv88</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
@@ -251,6 +251,7 @@
     <ClInclude Include="image.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="matrix.h" />
+    <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="random.h" />
     <ClInclude Include="renderer.h" />
     <None Include="stb_image.h">

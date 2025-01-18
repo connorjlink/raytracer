@@ -6,11 +6,11 @@ namespace luma
 	class Image
 	{
 	private:
-		const std::uint32_t _width, _height;
+		const std::int32_t _width, _height;
 		std::uint32_t* _data;
 
 	public:
-		Image(std::uint32_t, std::uint32_t) noexcept;
+		Image(std::int32_t, std::int32_t, bool) noexcept;
 
 	public:
 		void shadow_from(std::uint32_t*) noexcept;

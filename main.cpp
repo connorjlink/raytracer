@@ -1,65 +1,69 @@
-/*#pragma once
+﻿import std;
 
-#ifdef WL_PLATFORM_WINDOWS
-
-extern Walnut::Application* Walnut::CreateApplication(int argc, char** argv);
-bool g_ApplicationRunning = true;
-
-namespace Walnut
-{
-	int Main(int argc, char** argv)
-	{
-		while (g_ApplicationRunning)
-		{
-			Walnut::Application* app = Walnut::CreateApplication(argc, argv);
-			app->Run();
-			delete app;
-		}
-
-		return 0;
-	}
-}
-
-#ifdef WL_DIST
-
-#include <Windows.h>
-
-int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow)
-{
-	return Walnut::Main(__argc, __argv);
-}
-
-#else
-
-int main(int argc, char** argv)
-{
-	return Walnut::Main(argc, argv);
-}
-
-#endif // WL_DIST
-
-#endif // WL_PLATFORM_WINDOWS*/
-
-import std;
-
+#define OLC_PGE_APPLICATION
+#include "olcPixelGameEngine.h"
 #include "arguments.h"
 #include "application.h"
+#include "image.h"
 #include "renderer.h"
 
 luma::Options luma::_options;
+
+using namespace std::chrono_literals;
+
+class Luma : public olc::PixelGameEngine
+{
+public:
+	Luma()
+		: image{ ScreenWidth(), ScreenHeight(), false }
+	{
+		window_title = "Luma";
+	}
+
+private:
+	luma::Application application;
+	luma::Renderer renderer;
+	luma::Image image;
+	std::uint32_t* framebuffer;
+
+public:
+	bool OnUserCreate() override
+	{
+		application = {};
+		renderer = {};
+
+		framebuffer = new std::uint32_t[ScreenWidth() * ScreenHeight()];
+
+		return true;
+	}
+
+	bool OnUserUpdate(float Δt) override
+	{
+		renderer.render_to(framebuffer);
+
+		if (GetKey(olc::Key::CTRL).bHeld &&
+			GetKey(olc::Key::P).bHeld)
+		{
+			image.shadow_from(framebuffer);
+			image.export_to("luma.ppm");
+
+			std::println("successfully exported frame capture to `luma.ppm`");
+		}
+
+		std::this_thread::sleep_for(1000ms);
+
+		return true;
+	}
+};
 
 int main(int argc, char** argv)
 {
 	auto arguments = luma::Arguments{};
 	arguments.parse(argc, argv);
 
-	auto application = luma::Application{};
-	auto renderer = luma::Renderer{};
-	renderer.render();
-
-    // window title "Luma"
-    // window width 1600
-    // window height 900
+	Luma demo{};
+	if (demo.Construct(100, 100, 5, 5))
+		demo.Start();
 
 	return 0;
 }

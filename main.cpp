@@ -39,7 +39,7 @@ public:
 
 	bool OnUserUpdate(float Δt) override
 	{
-		renderer.render_to(framebuffer);
+		renderer.render_to(framebuffer, *this);
 
 		if (GetKey(olc::Key::CTRL).bHeld &&
 			GetKey(olc::Key::P).bHeld)
@@ -50,7 +50,22 @@ public:
 			std::println("successfully exported frame capture to `luma.ppm`");
 		}
 
-		std::this_thread::sleep_for(1000ms);
+		for (auto x = 0; x < ScreenWidth(); x++)
+		{
+			for (auto y = 0; y < ScreenHeight(); y++)
+			{
+				const auto data = framebuffer[y * ScreenWidth() + x];
+
+				const std::uint8_t red = (data & 0xFF0000) >> 16;
+				const std::uint8_t green = (data & 0xFF00) >> 8;
+				const std::uint8_t blue = (data & 0xFF) >> 0;
+
+				const olc::Pixel pixel{ red, green, blue };
+				Draw(x, y, pixel);
+			}
+		}
+
+		std::this_thread::sleep_for(100ms);
 
 		return true;
 	}

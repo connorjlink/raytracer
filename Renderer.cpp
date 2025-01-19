@@ -1,8 +1,9 @@
 import std;
 
+#include "olcPixelGameEngine.h"
+
 #include "renderer.h"
 #include "arguments.h"
-#include "image.h"
 #include "timer.h"
 #include "random.h"
 
@@ -198,14 +199,14 @@ namespace luma
 		return result;
 	}
 
-	void Renderer::render_to(std::uint32_t* target) noexcept
+	void Renderer::render_to(std::uint32_t* target, const olc::PixelGameEngine& pge) noexcept
 	{
 		cjl::Timer timer{};
 
 		const auto width = _options.width;
 		const auto height = _options.height;
 
-		camera.update(frametime);
+		camera.update(frametime, pge);
 
 		if (camera.moved)
 		{

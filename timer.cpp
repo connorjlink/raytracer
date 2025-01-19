@@ -19,7 +19,7 @@ namespace cjl
 		const auto now = std::chrono::high_resolution_clock::now();
 		const auto diff = now - _start;
 		const auto result = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
-		return result;
+		return static_cast<float>(result);
 	}
 
 	float Timer::milliseconds() const noexcept
@@ -27,7 +27,7 @@ namespace cjl
 		const auto now = std::chrono::high_resolution_clock::now();
 		const auto diff = now - _start;
 		const auto result = std::chrono::duration_cast<std::chrono::milliseconds>(diff).count();
-		return result;
+		return static_cast<float>(result);
 	}
 
 	float Timer::nanoseconds() const noexcept
@@ -35,7 +35,7 @@ namespace cjl
 		const auto now = std::chrono::high_resolution_clock::now();
 		const auto diff = now - _start;
 		const auto result = std::chrono::duration_cast<std::chrono::nanoseconds>(diff).count();
-		return result;
+		return static_cast<float>(result);
 	}
 
 

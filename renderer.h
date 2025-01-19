@@ -61,7 +61,7 @@ namespace luma
 
 	public:
 		Renderer(void) noexcept;
-		void render_to(std::uint32_t*) noexcept;
+		void render_to(std::uint32_t*, const olc::PixelGameEngine&) noexcept;
 
 	private:
 		Intersection miss(void) noexcept;

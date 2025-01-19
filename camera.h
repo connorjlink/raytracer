@@ -4,18 +4,13 @@
 #include "base.h"
 #include "types.h"
 
-namespace olc
-{
-	class PixelGameEngine;
-}
-
 namespace luma
 {
 	class Camera
 	{
 	public:
 		Camera(float, float, float, std::uint32_t, std::uint32_t) noexcept;
-		bool update(float, olc::PixelGameEngine&) noexcept;
+		bool update(float, const olc::PixelGameEngine&) noexcept;
 
 	private:
 		void recompute_projection(void) noexcept;
@@ -36,7 +31,7 @@ namespace luma
 
 		std::vector<cjl::vec3> rays;
 
-		cjl::vec2 lastmouse{ 0.0f, 0.0f };
+		olc::vi2d mouse_pos_old{ 0, 0 };
 
 		std::uint32_t width = 0, height = 0;
 	};

@@ -1,10 +1,10 @@
 ﻿import std;
 
+#include "olcPixelGameEngine.h"
+
 #include "camera.h"
 #include "vector.h"
 #include "matrix.h"
-
-#include "olcPixelGameEngine.h"
 
 namespace luma
 {
@@ -19,15 +19,24 @@ namespace luma
 		moved = true;
 	}
 
-	bool Camera::update(float ts, olc::PixelGameEngine& pge) noexcept
+	bool Camera::update(float ts, const olc::PixelGameEngine& pge) noexcept
 	{
+		if (moved)
+		{
+			recompute_view();
+			recompute_rays();
+		}
+
 		static constexpr auto movement_speed = .01f;
 		static constexpr auto look_speed = .002f;
 		static constexpr auto rotation_speed = .3f;
 
+		const cjl::vec3 up{ 0.f, 1.f, 0.f };
+		const cjl::vec3 right = cjl::cross(dir, up);
+
 		const auto mouse_pos = pge.GetMousePos();
-		const auto Δmouse = (mouse_pos - lastmouse) * look_speed;
-		lastmouse = mouse_pos;
+		const auto Δmouse = (mouse_pos - mouse_pos_old) * look_speed;
+		mouse_pos_old = mouse_pos;
 
 		/*if (!Input::IsMouseButtonDown(MouseButton::Right))
 		{
@@ -38,18 +47,15 @@ namespace luma
 		Input::SetCursorMode(CursorMode::Locked);*/
 
 		moved = false;
+		
+			 if (pge.GetKey(olc::Key::W).bHeld) { pos = cjl::add(pos, cjl::scale(dir, movement_speed * ts)); moved = true; }
+		else if (pge.GetKey(olc::Key::S).bHeld) { pos = cjl::subtract(pos, cjl::scale(dir, movement_speed * ts)); moved = true; }
 
-		constexpr cjl::vec3 up{ 0.f, 1.f, 0.f };
-		const cjl::vec3 right = cjl::cross(dir, up);
+			 if (pge.GetKey(olc::Key::A).bHeld) { pos = cjl::subtract(pos, cjl::scale(right, movement_speed * ts)); moved = true; }
+		else if (pge.GetKey(olc::Key::D).bHeld) { pos = cjl::add(pos, cjl::scale(right, movement_speed * ts)); moved = true; }
 
-			 if (pge.GetKey(olc::Key::W).bHeld) { pos += dir * movement_speed * ts; moved = true; }
-		else if (pge.GetKey(olc::Key::S).bHeld) { pos -= dir * movement_speed * ts; moved = true; }
-
-			 if (pge.GetKey(olc::Key::A).bHeld) { pos -= right * movement_speed * ts; moved = true; }
-		else if (pge.GetKey(olc::Key::D).bHeld) { pos += right * movement_speed * ts; moved = true; }
-
-			 if (pge.GetKey(olc::Key::Q).bHeld) { pos -= up * movement_speed * ts; moved = true; }
-		else if (pge.GetKey(olc::Key::E).bHeld) { pos += up * movement_speed * ts; moved = true; }
+			 if (pge.GetKey(olc::Key::Q).bHeld) { pos = cjl::subtract(pos, cjl::scale(up, movement_speed * ts)); moved = true; }
+		else if (pge.GetKey(olc::Key::E).bHeld) { pos = cjl::add(pos, cjl::scale(up, movement_speed * ts)); moved = true; }
 
 		if (Δmouse.x != .0f || Δmouse.y != .0f)
 		{
@@ -61,12 +67,6 @@ namespace luma
 			//dir = cjl::rotate(q, dir);
 
 			moved = true;
-		}
-
-		if (moved)
-		{
-		    recompute_view();
-		    recompute_rays();
 		}
 
 		return moved;

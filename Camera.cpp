@@ -19,16 +19,10 @@ namespace luma
 		moved = true;
 	}
 
-	bool Camera::update(float ts, const olc::PixelGameEngine& pge) noexcept
+	bool Camera::update(float ts, olc::PixelGameEngine& pge) noexcept
 	{
-		if (moved)
-		{
-			recompute_view();
-			recompute_rays();
-		}
-
 		static constexpr auto movement_speed = .01f;
-		static constexpr auto look_speed = .002f;
+		static constexpr auto look_speed = .02f;
 		static constexpr auto rotation_speed = .3f;
 
 		const cjl::vec3 up{ 0.f, 1.f, 0.f };
@@ -36,6 +30,7 @@ namespace luma
 
 		const auto mouse_pos = pge.GetMousePos();
 		const auto Δmouse = (mouse_pos - mouse_pos_old) * look_speed;
+		pge.DrawStringDecal(olc::vf2d{ 0.f, 0.f }, std::format("{}, {}", Δmouse.x, Δmouse.y));
 		mouse_pos_old = mouse_pos;
 
 		/*if (!Input::IsMouseButtonDown(MouseButton::Right))
@@ -48,8 +43,8 @@ namespace luma
 
 		moved = false;
 		
-			 if (pge.GetKey(olc::Key::W).bHeld) { pos = cjl::add(pos, cjl::scale(dir, movement_speed * ts)); moved = true; }
-		else if (pge.GetKey(olc::Key::S).bHeld) { pos = cjl::subtract(pos, cjl::scale(dir, movement_speed * ts)); moved = true; }
+			 if (pge.GetKey(olc::Key::W).bHeld) { pos = cjl::subtract(pos, cjl::scale(dir, movement_speed * ts)); moved = true; }
+		else if (pge.GetKey(olc::Key::S).bHeld) { pos = cjl::add(pos, cjl::scale(dir, movement_speed * ts)); moved = true; }
 
 			 if (pge.GetKey(olc::Key::A).bHeld) { pos = cjl::subtract(pos, cjl::scale(right, movement_speed * ts)); moved = true; }
 		else if (pge.GetKey(olc::Key::D).bHeld) { pos = cjl::add(pos, cjl::scale(right, movement_speed * ts)); moved = true; }
@@ -59,14 +54,36 @@ namespace luma
 
 		if (Δmouse.x != .0f || Δmouse.y != .0f)
 		{
-			float Δpitch = -Δmouse.y * rotation_speed,
-				  Δyaw = +Δmouse.x * rotation_speed;
+			float Δpitch = +Δmouse.y * rotation_speed,
+				  Δyaw   = -Δmouse.x * rotation_speed;
+
+			const auto cos_pitch = std::cos(Δpitch);
+			const auto sin_pitch = std::sin(Δpitch);
+
+			const auto cos_yaw = std::cos(Δyaw);
+			const auto sin_yaw = std::sin(Δyaw);
+
+			const auto dir_copy = dir;
+
+			dir =
+			{
+				 dir_copy[0]             * cos_yaw                           + dir_copy[2]             * sin_yaw,
+				 dir_copy[0] * sin_pitch * sin_yaw + dir_copy[1] * cos_pitch - dir_copy[2] * sin_pitch * cos_yaw,
+				-dir_copy[0] * cos_pitch * sin_yaw + dir_copy[1] * sin_pitch + dir_copy[2] * cos_pitch * cos_yaw,
+			};
+
 
 			//cjl::quat q = cjl::normalize(cjl::cross(cjl::angleAxis(-pitchDelta, right),
 			//	cjl::angleAxis(-yawDelta, cjl::vec3{ 0, 1, 0 })));
 			//dir = cjl::rotate(q, dir);
 
 			moved = true;
+		}
+
+		if (moved)
+		{
+			recompute_view();
+			recompute_rays();
 		}
 
 		return moved;

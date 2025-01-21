@@ -10,7 +10,7 @@ namespace luma
 	{
 	public:
 		Camera(float, float, float, std::uint32_t, std::uint32_t) noexcept;
-		bool update(float, const olc::PixelGameEngine&) noexcept;
+		bool update(float, olc::PixelGameEngine&) noexcept;
 
 	private:
 		void recompute_projection(void) noexcept;

@@ -17,6 +17,16 @@ namespace cjl
 			_data = {};
 		}
 
+		vec(T value)
+		{
+			// broadcast(value)
+
+			for (auto i = 0; i < _data.size(); i++)
+			{
+				_data[i] = value;
+			}
+		}
+
 		template<typename... Ts>
 		vec(Ts... ts)
 		{

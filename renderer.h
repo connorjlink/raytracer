@@ -44,14 +44,14 @@ namespace luma
 
 		Intersection* closest = nullptr;
 
-		Sphere s{ { 0, 0, -10 }, 1.0f, { 1, 0, 0 }, 1, 0 };
+		Sphere s{ { 0, 0, 10 }, 1.0f, { 1, 0, 0 }, 1, 0 };
 
-		Sphere a{ { 0, 1000, 0}, 1000, { .6, .6, .6 }, 1, 0 };
-		Sphere b{ { 1003, 0, 0}, 1000, { .6, .6, .6 }, 0, 1 };
-		Sphere c{ { 0, 0, 1003}, 1000, { .6, .6, .6 }, 0, 1 };
-		Sphere d{ { 0, -1003, 0}, 1000, { .6, .6, .6 }, 0, 1 };
-		Sphere e{ { -1003, 0, 0}, 1000, { .6, .6, .6 }, 0, 1 };
-		Sphere f{ { 0, 0, -1003}, 1000, { .6, .6, .6 }, 0, 1 };
+		Sphere a{ { 0, 1000, 0 }, 1000, { .6, .6, .6 }, 1, 0 };
+		Sphere b{ { 1003, 0, 0 }, 1000, { .6, .6, .6 }, 0, 1 };
+		Sphere c{ { 0, 0, 1003 }, 1000, { .6, .6, .6 }, 0, 1 };
+		Sphere d{ { 0, -1003, 0 }, 1000, { .6, .6, .6 }, 0, 1 };
+		Sphere e{ { -1003, 0, 0 }, 1000, { .6, .6, .6 }, 0, 1 };
+		Sphere f{ { 0, 0, -1003 }, 1000, { .6, .6, .6 }, 0, 1 };
 
 		Sphere t{ { 2, -1, 0 }, 0.5f, { 0, 1, 0 }, 1, 0 };
 
@@ -61,7 +61,7 @@ namespace luma
 
 	public:
 		Renderer(void) noexcept;
-		void render_to(std::uint32_t*, const olc::PixelGameEngine&) noexcept;
+		void render_to(std::uint32_t*, olc::PixelGameEngine&) noexcept;
 
 	private:
 		Intersection miss(void) noexcept;

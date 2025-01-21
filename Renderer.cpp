@@ -42,6 +42,8 @@ namespace luma
 	Renderer::Renderer(void) noexcept
 		: camera(70.0f, 0.1f, 100.0f, _options.width, _options.height)
 	{
+		delete[] accumulated_data;
+		accumulated_data = new cjl::vec3[_options.width * _options.height]();
 	}
 
 	Intersection Renderer::miss(void) noexcept
@@ -199,7 +201,7 @@ namespace luma
 		return result;
 	}
 
-	void Renderer::render_to(std::uint32_t* target, const olc::PixelGameEngine& pge) noexcept
+	void Renderer::render_to(std::uint32_t* target, olc::PixelGameEngine& pge) noexcept
 	{
 		cjl::Timer timer{};
 
@@ -214,6 +216,12 @@ namespace luma
 
 			delete[] accumulated_data;
 			accumulated_data = new cjl::vec3[width * height]();
+
+			for (auto i = 0; i < width * height; i++)
+			{
+				accumulated_data[i] = cjl::vec3(0.f);
+			}
+
 			camera.moved = false;
 		}
 

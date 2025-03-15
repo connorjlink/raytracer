@@ -1,5 +1,11 @@
 # Directories
 .vs/
+.vscode/
+ARM64/
+x86/
+x64/
+Debug/
+Release/
 bin/
 bin-int/
 raytracer/

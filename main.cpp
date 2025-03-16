@@ -65,7 +65,7 @@ public:
 			}
 		}
 
-		std::this_thread::sleep_for(100ms);
+		std::this_thread::sleep_for(200ms);
 
 		return true;
 	}

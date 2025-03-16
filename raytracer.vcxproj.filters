@@ -13,6 +13,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Git Files">
+      <UniqueIdentifier>{03e9be89-87e4-47f9-9b4c-e4bf9bc7880f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Module Source Files">
+      <UniqueIdentifier>{e5f55705-8575-4f14-a840-f4010bd4e767}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arguments.cpp">
@@ -27,13 +33,7 @@
     <ClCompile Include="renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="random.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="application.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="log.cpp">
@@ -41,6 +41,18 @@
     </ClCompile>
     <ClCompile Include="image.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="flux\timer.cpp">
+      <Filter>Module Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="flux\random.cpp">
+      <Filter>Module Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="flux\test.cpp">
+      <Filter>Module Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="flux\implementation.cpp">
+      <Filter>Module Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -53,28 +65,7 @@
     <ClInclude Include="arguments.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="float.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="random.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="application.h">
@@ -90,6 +81,12 @@
   <ItemGroup>
     <None Include="stb_image.h">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include=".gitmodules">
+      <Filter>Git Files</Filter>
+    </None>
+    <None Include=".gitignore">
+      <Filter>Git Files</Filter>
     </None>
   </ItemGroup>
 </Project>

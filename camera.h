@@ -1,8 +1,7 @@
 #ifndef LUMA_CAMERA_HPP
 #define LUMA_CAMERA_HPP
 
-#include "base.h"
-#include "types.h"
+#include "flux/types.h"
 
 namespace luma
 {
@@ -18,7 +17,7 @@ namespace luma
 		void recompute_rays(void) noexcept;
 
 	public:
-		cjl::mat4 projection, projection_inverse, view, view_inverse;
+		fx::mat4 projection, projection_inverse, view, view_inverse;
 
 		float fov = 70.0f;
 
@@ -26,10 +25,10 @@ namespace luma
 
 		bool moved = false;
 
-		cjl::vec3 pos{ 0.0f, 0.5f, -2.0f },
-				  dir{ 0.0f, 0.0f,  0.0f };
+		fx::vec3 pos{ 0.0f, 0.5f,  5.0f },
+				 dir{ 0.0f, 0.0f, -1.0f };
 
-		std::vector<cjl::vec3> rays;
+		std::vector<fx::vec3> rays;
 
 		olc::vi2d mouse_pos_old{ 0, 0 };
 

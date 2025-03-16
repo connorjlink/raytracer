@@ -31,7 +31,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{63fa6eab-34e1-495a-bb84-7cbf069e81b7}</ProjectGuid>
     <RootNamespace>raytracer</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -236,31 +236,31 @@
     <ClCompile Include="application.cpp" />
     <ClCompile Include="arguments.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="flux\implementation.cpp" />
+    <ClCompile Include="flux\random.cpp" />
+    <ClCompile Include="flux\test.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="flux\timer.cpp" />
     <ClCompile Include="image.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="random.cpp" />
     <ClCompile Include="renderer.cpp" />
-    <ClCompile Include="timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="arguments.h" />
-    <ClInclude Include="base.h" />
     <ClInclude Include="camera.h" />
-    <ClInclude Include="float.h" />
     <ClInclude Include="image.h" />
     <ClInclude Include="log.h" />
-    <ClInclude Include="matrix.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
-    <ClInclude Include="random.h" />
     <ClInclude Include="renderer.h" />
+    <None Include=".gitignore" />
+    <None Include=".gitmodules" />
     <None Include="stb_image.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <ClInclude Include="timer.h" />
-    <ClInclude Include="types.h" />
-    <ClInclude Include="vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

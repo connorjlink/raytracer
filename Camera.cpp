@@ -2,19 +2,19 @@
 
 #include "olcPixelGameEngine.h"
 
+#include "flux/vector.h"
+
 #include "camera.h"
-#include "vector.h"
-#include "matrix.h"
 
 namespace luma
 {
 	Camera::Camera(float fov, float nearclip, float farclip, std::uint32_t width, std::uint32_t height) noexcept
 		: fov(fov), nearclip(nearclip), farclip(farclip), width{ width }, height{ height }
 	{
-		dir = cjl::vec3{ 0, 0, -1 };
-		pos = cjl::vec3{ 0, 0, 0 };
+		dir = fx::vec3{ 0, 0, -1 };
+		pos = fx::vec3{ 0, 0, 0 };
 
-       	projection = projection_inverse = view = view_inverse = cjl::identity();
+       	projection = projection_inverse = view = view_inverse = fx::identity();
 
 		moved = true;
 	}
@@ -25,8 +25,8 @@ namespace luma
 		static constexpr auto look_speed = .02f;
 		static constexpr auto rotation_speed = .3f;
 
-		const cjl::vec3 up{ 0.f, 1.f, 0.f };
-		const cjl::vec3 right = cjl::cross(dir, up);
+		const fx::vec3 up{ 0.f, 1.f, 0.f };
+		const fx::vec3 right = fx::cross(dir, up);
 
 		const auto mouse_pos = pge.GetMousePos();
 		const auto Δmouse = (mouse_pos - mouse_pos_old) * look_speed;
@@ -43,19 +43,19 @@ namespace luma
 
 		moved = false;
 		
-			 if (pge.GetKey(olc::Key::W).bHeld) { pos = cjl::subtract(pos, cjl::scale(dir, movement_speed * ts)); moved = true; }
-		else if (pge.GetKey(olc::Key::S).bHeld) { pos = cjl::add(pos, cjl::scale(dir, movement_speed * ts)); moved = true; }
+			 if (pge.GetKey(olc::Key::W).bHeld) { pos = fx::subtract(pos, fx::scale(dir, movement_speed * ts)); moved = true; }
+		else if (pge.GetKey(olc::Key::S).bHeld) { pos = fx::add(pos, fx::scale(dir, movement_speed * ts)); moved = true; }
 
-			 if (pge.GetKey(olc::Key::A).bHeld) { pos = cjl::subtract(pos, cjl::scale(right, movement_speed * ts)); moved = true; }
-		else if (pge.GetKey(olc::Key::D).bHeld) { pos = cjl::add(pos, cjl::scale(right, movement_speed * ts)); moved = true; }
+			 if (pge.GetKey(olc::Key::A).bHeld) { pos = fx::subtract(pos, fx::scale(right, movement_speed * ts)); moved = true; }
+		else if (pge.GetKey(olc::Key::D).bHeld) { pos = fx::add(pos, fx::scale(right, movement_speed * ts)); moved = true; }
 
-			 if (pge.GetKey(olc::Key::Q).bHeld) { pos = cjl::subtract(pos, cjl::scale(up, movement_speed * ts)); moved = true; }
-		else if (pge.GetKey(olc::Key::E).bHeld) { pos = cjl::add(pos, cjl::scale(up, movement_speed * ts)); moved = true; }
+			 if (pge.GetKey(olc::Key::Q).bHeld) { pos = fx::subtract(pos, fx::scale(up, movement_speed * ts)); moved = true; }
+		else if (pge.GetKey(olc::Key::E).bHeld) { pos = fx::add(pos, fx::scale(up, movement_speed * ts)); moved = true; }
 
 		if (Δmouse.x != .0f || Δmouse.y != .0f)
 		{
-			float Δpitch = +Δmouse.y * rotation_speed,
-				  Δyaw   = -Δmouse.x * rotation_speed;
+			const float Δpitch = +Δmouse.y * rotation_speed,
+				        Δyaw   = -Δmouse.x * rotation_speed;
 
 			const auto cos_pitch = std::cos(Δpitch);
 			const auto sin_pitch = std::sin(Δpitch);
@@ -91,16 +91,16 @@ namespace luma
 
 	void Camera::recompute_projection(void) noexcept
 	{
-		projection = cjl::perspective(cjl::radians(fov), static_cast<float>(width), static_cast<float>(height), nearclip, farclip);
-		projection_inverse = cjl::inverse(projection);
+		projection = fx::perspective(fx::radians(fov), static_cast<float>(width), static_cast<float>(height), nearclip, farclip);
+		projection_inverse = fx::inverse(projection);
 	}
 
 	void Camera::recompute_view(void) noexcept
 	{
-		const auto at = cjl::add(pos, dir);
+		const auto at = fx::add(pos, dir);
 
-		view = cjl::lookat(pos, at, cjl::vec3{ 0.f, 1.f, 0.f });
-		view_inverse = cjl::inverse(view);
+		view = fx::lookat(pos, at, fx::vec3{ 0.f, 1.f, 0.f });
+		view_inverse = fx::inverse(view);
 	}
 
 	void Camera::recompute_rays(void) noexcept
@@ -111,27 +111,27 @@ namespace luma
 		{
 			for (auto x = 0u; x < width; x++)
 			{
-				const auto one = cjl::broadcast<2>(1.f);
+				const auto one = fx::broadcast<2>(1.f);
 
-				cjl::vec2 coordinate = { static_cast<float>(x) / width,
-										 static_cast<float>(y) / height };
+				fx::vec2 coordinate = { static_cast<float>(x) / width,
+										static_cast<float>(y) / height };
 
 				// renormalization
-				coordinate = cjl::scale(coordinate, 2.f);
-				coordinate = cjl::subtract(coordinate, one);
+				coordinate = fx::scale(coordinate, 2.f);
+				coordinate = fx::subtract(coordinate, one);
 
-				const auto extended = cjl::vec4{ coordinate[0], coordinate[1], 1.f, 1.f };
-				const auto target = cjl::apply(projection_inverse, extended);
+				const auto extended = fx::vec4{ coordinate[0], coordinate[1], 1.f, 1.f };
+				const auto target = fx::apply(projection_inverse, extended);
 
-				const auto truncated = cjl::truncate(target);
+				const auto truncated = fx::truncate(target);
 				const auto scalar = 1 / target[3];
 
-				const auto corrected = cjl::scale(truncated, scalar);
-				const auto normalized = cjl::normalize(corrected);
-				const auto padded = cjl::extend(normalized, 0.f);
+				const auto corrected = fx::scale(truncated, scalar);
+				const auto normalized = fx::normalize(corrected);
+				const auto padded = fx::extend(normalized, 0.f);
 
-				const auto ray = cjl::apply(view_inverse, padded);
-				rays[y * width + x] = cjl::truncate(ray);
+				const auto ray = fx::apply(view_inverse, padded);
+				rays[y * width + x] = fx::truncate(ray);
 			}
 		}
 	}

@@ -1,30 +1,30 @@
 #ifndef LUMA_RENDERER_H
 #define LUMA_RENDERER_H
 
-#include "vector.h"
+#include "flux/types.h"
 #include "camera.h"
 
 namespace luma
 {
 	struct Ray
 	{
-		cjl::vec3 pos, dir;
+		fx::vec3 pos, dir;
 	};
 
 	struct Sphere
 	{
-		cjl::vec3 pos;
+		fx::vec3 pos;
 		float radius;
 
-		cjl::vec3 diffuse;
+		fx::vec3 diffuse;
 		float metallic, roughness;
 	};
 
 	struct Intersection
 	{
-		cjl::vec3 color;
-		cjl::vec3 pos;
-		cjl::vec3 normal;
+		fx::vec3 color;
+		fx::vec3 pos;
+		fx::vec3 normal;
 		float distance, exit;
 		Sphere* object;
 
@@ -38,13 +38,13 @@ namespace luma
 		float frame_count = 1.f;
 		
 		bool accumulate = true;
-		cjl::vec3* accumulated_data = nullptr;
+		fx::vec3* accumulated_data = nullptr;
 
 		Camera camera;
 
 		Intersection* closest = nullptr;
 
-		Sphere s{ { 0, 0, 10 }, 1.0f, { 1, 0, 0 }, 1, 0 };
+		Sphere s{ { 0, 0, 10 }, 1.0f, { 1, 1, 0 }, 1, 1 };
 
 		Sphere a{ { 0, 1000, 0 }, 1000, { .6, .6, .6 }, 1, 0 };
 		Sphere b{ { 1003, 0, 0 }, 1000, { .6, .6, .6 }, 0, 1 };
@@ -57,7 +57,7 @@ namespace luma
 
 		std::vector<Sphere> spheres{ s };
 
-		cjl::vec3 light{ 0, -1, 0 };
+		fx::vec3 light{ 0, -1, 0 };
 
 	public:
 		Renderer(void) noexcept;
@@ -66,7 +66,7 @@ namespace luma
 	private:
 		Intersection miss(void) noexcept;
 		Intersection trace_ray(const Ray&) noexcept;
-		cjl::vec3 render_pixel(std::uint32_t, std::uint32_t) noexcept;
+		fx::vec3 render_pixel(std::uint32_t, std::uint32_t) noexcept;
 	};
 }
 

@@ -48,13 +48,11 @@ namespace luma
 
 		delete[] accumulated_data;
 		accumulated_data = new fx::vec3[size]();
-
-		camera.rays.resize(size);
 	}
 
 	Intersection Renderer::miss(void) noexcept
 	{
-		return { fx::vec3(.6f, .7f, .95f), fx::vec3{ 0.f, 0.f, 0.f }, fx::vec3{ 0.f, 0.f, 0.f }, 0, 0, nullptr};
+		return { fx::vec3(.6f, .7f, .95f), 1.f, 1.f, fx::vec3{ 0.f, 0.f, 0.f }, fx::vec3{ 0.f, 0.f, 0.f }, 0, 0, nullptr};
 	}
 
 	Intersection Renderer::trace_ray(const Ray& ray) noexcept
@@ -92,7 +90,7 @@ namespace luma
 					if (t < distance)
 					{
 						distance = t;
-						intersection = { sphere.diffuse, hit, normal, t, e, &sphere };
+						intersection = { sphere.diffuse, sphere.metallic, sphere.roughness, hit, normal, t, e, &sphere };
 					}
 				}
 			}
@@ -123,31 +121,63 @@ namespace luma
 		const auto ray = Ray{ pos, dir_noised };
 		auto intersection = trace_ray(ray);
 
+		if (intersection.object != nullptr)
+		{
+			const auto scalar = (fx::dot(light, intersection.normal) + 1) / 2;
+			intersection.color = fx::scale(intersection.color, scalar);
+		}
+
 		const auto first = intersection;
 
-		auto multiplier = .5f;
+		auto fresnel = [&](auto&& intersection)
+		{
+			// fresnel's law
+			const auto cos_incident = fx::dot(fx::invert(dir_noised), intersection.normal);
+			const auto coefficient = intersection.metallic;
+			const auto sin_theta_squared = coefficient * coefficient * (1 - (cos_incident * cos_incident));
+			
+			if (sin_theta_squared > 1.)
+			{
+				// total internal reflection
+				return 1.f;
+			}
+
+			const auto cos_theta = std::sqrt(1 - sin_theta_squared);
+
+			// schlick approximation
+			const auto r0 = (1 - coefficient) / (1 + coefficient);
+			const auto r0_squared = r0 * r0;
+
+			const auto partial = 1 - cos_incident;
+			const auto power = partial * partial * partial * partial * partial;
+
+			const auto r = r0 + (1 - r0) * power;
+
+			return r;
+		};
+
 
 		for (auto bounce = 0u; bounce < _options.bounces; bounce++)
 		{
-			if (intersection == miss())
+			if (intersection.object == nullptr)
 			{
-				const fx::vec3 sky(.6f, .7f, .9f);
+				const fx::vec3 sky_color{ .6f, .7f, .9f };
 				
-				const auto sky_contribution = fx::scale(sky, multiplier);
-				direct = fx::add(direct, sky_contribution);
+				const auto miss_contribution = fresnel(intersection);
+				const auto sky = fx::scale(sky_color, miss_contribution);
+				direct = fx::add(direct, sky);
 
 				break;
 			}
 
-			const auto hit_contribution = fx::scale(intersection.color, multiplier);
-			direct = fx::add(direct, hit_contribution);
-
-			multiplier *= .5f;
+			const auto hit_contribution = fresnel(intersection);
+			const auto hit = fx::scale(intersection.color, hit_contribution);
+			direct = fx::add(direct, hit);
 
 			const auto extruded = fx::scale(intersection.normal, .001f);
 			pos = fx::add(intersection.pos, extruded);
 
-			const auto gain = .5f * intersection.object->roughness;
+			const auto gain = intersection.object->roughness;
 			const auto roughness_noise = fx::Random::vec3(-gain, gain);
 			const auto normal = fx::add(intersection.normal, roughness_noise);
 			const auto dir_noise = fx::Random::vec3(-offset, offset);
@@ -161,7 +191,7 @@ namespace luma
 
 		if (first != miss())
 		{
-			for (auto sample = 0u; sample < _options.samples - 1; sample++)
+			for (auto sample = 0u; sample < _options.samples; sample++)
 			{
 				auto dir = fx::Random::vec3_sphere();
 
@@ -241,7 +271,7 @@ namespace luma
 		{
 			for (auto x = 0u; x < width; ++x)
 			{
-#define TESTING
+//#define TESTING
 #ifndef TESTING
 				auto index = (y * width) + x;
 

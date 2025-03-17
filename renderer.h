@@ -23,6 +23,7 @@ namespace luma
 	struct Intersection
 	{
 		fx::vec3 color;
+		float metallic, roughness;
 		fx::vec3 pos;
 		fx::vec3 normal;
 		float distance, exit;
@@ -44,9 +45,10 @@ namespace luma
 
 		Intersection* closest = nullptr;
 
-		Sphere s{ { 0, 0, 10 }, 1.0f, { 1, 1, 0 }, 1, 1 };
+		Sphere s{ { 0, 0, -10 }, 2.0f, { 1, 1, 0 }, 1, 0 };
+		Sphere q{ { 4, 0, -10 }, 1.0f, { 0, 1, 0 }, 1, 0 };
 
-		Sphere a{ { 0, 1000, 0 }, 1000, { .6, .6, .6 }, 1, 0 };
+		Sphere a{ { 0, 1005, 0 }, 1000, { 1, 1, 1 }, 1, 0 };
 		Sphere b{ { 1003, 0, 0 }, 1000, { .6, .6, .6 }, 0, 1 };
 		Sphere c{ { 0, 0, 1003 }, 1000, { .6, .6, .6 }, 0, 1 };
 		Sphere d{ { 0, -1003, 0 }, 1000, { .6, .6, .6 }, 0, 1 };
@@ -55,9 +57,9 @@ namespace luma
 
 		Sphere t{ { 2, -1, 0 }, 0.5f, { 0, 1, 0 }, 1, 0 };
 
-		std::vector<Sphere> spheres{ s };
+		std::vector<Sphere> spheres{ s, q, a };
 
-		fx::vec3 light{ 0, -1, 0 };
+		fx::vec3 light{ 0, 1, 1 };
 
 	public:
 		Renderer(void) noexcept;

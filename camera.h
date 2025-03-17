@@ -25,8 +25,8 @@ namespace luma
 
 		bool moved = false;
 
-		fx::vec3 pos{ 0.0f, 0.5f,  5.0f },
-				 dir{ 0.0f, 0.0f, -1.0f };
+		fx::vec3 pos{ 0.0f, 0.5f, 5.0f },
+				 dir{ 0.0f, 0.0f, 1.0f };
 
 		std::vector<fx::vec3> rays;
 

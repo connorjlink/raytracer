@@ -65,7 +65,7 @@ public:
 			}
 		}
 
-		std::this_thread::sleep_for(200ms);
+		//std::this_thread::sleep_for(200ms);
 
 		return true;
 	}
@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 	arguments.parse(argc, argv);
 
 	Luma demo{};
-	if (demo.Construct(100, 100, 5, 5))
+	if (demo.Construct(200, 200, 5, 5))
 		demo.Start();
 
 	return 0;

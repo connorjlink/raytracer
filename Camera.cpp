@@ -57,6 +57,16 @@ namespace
 	
 		return out;
 	}
+
+	fx::vec3 cross(const fx::vec3& vector1, const fx::vec3& vector2)
+	{
+		return
+		{
+			vector1[1] * vector2[2] - vector1[2] * vector2[1],
+			vector1[2] * vector2[0] - vector1[0] * vector2[2],
+			vector1[0] * vector2[1] - vector1[1] * vector2[0]
+		};
+	}
 }
 
 namespace luma
@@ -80,27 +90,16 @@ namespace luma
 	{
 		static constexpr auto movement_speed = .01f;
 		static constexpr auto look_speed = .02f;
-		static constexpr auto rotation_speed = .1f;
-
-		const fx::vec3 up{ 0.f, 1.f, 0.f };
-		const fx::vec3 right = fx::cross(dir, up);
-
-		/*const auto mouse_pos = pge.GetMousePos();
-		const auto mouse = (mouse_pos - mouse_pos_old) * look_speed;
-		mouse_pos_old = mouse_pos;*/
-
-		/*if (!Input::IsMouseButtonDown(MouseButton::Right))
-		{
-			Input::SetCursorMode(CursorMode::Normal);
-			return false;
-		}
-
-		Input::SetCursorMode(CursorMode::Locked);*/
+		static constexpr auto rotation_speed = .003f;
 
 		moved = false;
-		
-			 if (pge.GetKey(olc::Key::W).bHeld) { pos = fx::add(pos, fx::scale(dir, movement_speed * ts)); moved = true; }
-		else if (pge.GetKey(olc::Key::S).bHeld) { pos = fx::subtract(pos, fx::scale(dir, movement_speed * ts)); moved = true; }
+
+		const fx::vec3 up{ 0.f, 1.f, 0.f };
+		const auto forward = fx::normalize(fx::vec3{ dir[0], 0.f, dir[2] });
+		const auto right = fx::cross(forward, up);
+
+			 if (pge.GetKey(olc::Key::W).bHeld) { pos = fx::add(pos, fx::scale(forward, movement_speed * ts)); moved = true; }
+		else if (pge.GetKey(olc::Key::S).bHeld) { pos = fx::subtract(pos, fx::scale(forward, movement_speed * ts)); moved = true; }
 
 			 if (pge.GetKey(olc::Key::A).bHeld) { pos = fx::subtract(pos, fx::scale(right, movement_speed * ts)); moved = true; }
 		else if (pge.GetKey(olc::Key::D).bHeld) { pos = fx::add(pos, fx::scale(right, movement_speed * ts)); moved = true; }
@@ -108,41 +107,39 @@ namespace luma
 			 if (pge.GetKey(olc::Key::Q).bHeld) { pos = fx::add(pos, fx::scale(up, movement_speed * ts)); moved = true; }
 		else if (pge.GetKey(olc::Key::E).bHeld) { pos = fx::subtract(pos, fx::scale(up, movement_speed * ts)); moved = true; }
 
-		float pitch = 0.f, yaw = 0.f;
+			 if (pge.GetKey(olc::Key::UP).bHeld)   { pitch += rotation_speed * ts; moved = true; }
+		else if (pge.GetKey(olc::Key::DOWN).bHeld) { pitch -= rotation_speed * ts; moved = true; }
 
-			 if (pge.GetKey(olc::Key::UP).bHeld) { pitch = +rotation_speed; moved = true; }
-		else if (pge.GetKey(olc::Key::DOWN).bHeld) { pitch = -rotation_speed; moved = true; }
+			 if (pge.GetKey(olc::Key::LEFT).bHeld)  { yaw -= rotation_speed * ts; moved = true; }
+		else if (pge.GetKey(olc::Key::RIGHT).bHeld) { yaw += rotation_speed * ts; moved = true; }
 
-			 if (pge.GetKey(olc::Key::LEFT).bHeld) { yaw = -rotation_speed; moved = true; }
-		else if (pge.GetKey(olc::Key::RIGHT).bHeld) { yaw = +rotation_speed; moved = true; }
 
-		if (pitch != .0f || yaw != .0f)
+		/*const float Δpitch = -Δmouse.y * rotation_speed,
+					    Δyaw   = +Δmouse.x * rotation_speed;*/
+
+		// prevent gimbal lock by limiting pitch control
+		pitch = std::clamp(pitch, -fx::pi() / 4, fx::pi() / 4);
+
+		const auto cos_pitch = std::cos(pitch);
+		const auto sin_pitch = std::sin(pitch);
+
+		const auto cos_yaw = std::cos(yaw);
+		const auto sin_yaw = std::sin(yaw);
+
+		const auto base = fx::vec3{ 0.f, 0.f, -1.0f };
+
+		dir =
 		{
-			/*const float Δpitch = -Δmouse.y * rotation_speed,
-						Δyaw   = +Δmouse.x * rotation_speed;*/
-
-			const auto cos_pitch = std::cos(pitch);
-			const auto sin_pitch = std::sin(pitch);
-
-			const auto cos_yaw = std::cos(yaw);
-			const auto sin_yaw = std::sin(yaw);
-
-			const auto dir_copy = dir;
-
-			dir =
-			{
-				 dir_copy[0]             * cos_yaw                           + dir_copy[2]             * sin_yaw,
-				 dir_copy[0] * sin_pitch * sin_yaw + dir_copy[1] * cos_pitch - dir_copy[2] * sin_pitch * cos_yaw,
-				-dir_copy[0] * cos_pitch * sin_yaw + dir_copy[1] * sin_pitch + dir_copy[2] * cos_pitch * cos_yaw,
-			};
+			 base[0]             * cos_yaw                       + base[2]             * sin_yaw,
+			 base[0] * sin_pitch * sin_yaw + base[1] * cos_pitch - base[2] * sin_pitch * cos_yaw,
+			-base[0] * cos_pitch * sin_yaw + base[1] * sin_pitch + base[2] * cos_pitch * cos_yaw,
+		};
 
 
-			//cjl::quat q = cjl::normalize(cjl::cross(cjl::angleAxis(-pitchDelta, right),
-			//	cjl::angleAxis(-yawDelta, cjl::vec3{ 0, 1, 0 })));
-			//dir = cjl::rotate(q, dir);
-
-			moved = true;
-		}
+		//cjl::quat q = cjl::normalize(cjl::cross(cjl::angleAxis(-pitchDelta, right),
+		//	cjl::angleAxis(-yawDelta, cjl::vec3{ 0, 1, 0 })));
+		//dir = cjl::rotate(q, dir);
+		
 
 		if (moved)
 		{

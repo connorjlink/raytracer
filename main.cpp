@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 	arguments.parse(argc, argv);
 
 	Luma demo{};
-	if (demo.Construct(200, 200, 5, 5))
+	if (demo.Construct(500, 500, 2, 2))
 		demo.Start();
 
 	return 0;

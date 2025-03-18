@@ -39,6 +39,24 @@ namespace
 	}
 }
 
+namespace
+{
+	template<typename T>
+	class SquareRoot
+	{
+	public:
+		T operator()(T value) const noexcept
+		{
+			return std::sqrt(value);
+		}
+	};
+}
+
+namespace
+{
+	static constexpr auto OFFSET = .001f;
+}
+
 namespace luma
 {
 	Renderer::Renderer(void) noexcept
@@ -53,6 +71,57 @@ namespace luma
 	Intersection Renderer::miss(void) noexcept
 	{
 		return { fx::vec3(.6f, .7f, .95f), 1.f, 1.f, fx::vec3{ 0.f, 0.f, 0.f }, fx::vec3{ 0.f, 0.f, 0.f }, 0, 0, nullptr};
+	}
+
+	fx::vec3 Renderer::direct_illumination(const Intersection& intersection) noexcept
+	{
+
+
+		return fx::vec3();
+	}
+
+	fx::vec3 Renderer::indirect_illumination(const Intersection& intersection) noexcept
+	{
+		fx::vec3 out{};
+
+		for (auto sample = 0u; sample < _options.samples; sample++)
+		{
+			auto dir = fx::Random::vec3_sphere();
+
+			// ensure the noise points outward
+			if (fx::dot(dir, intersection.normal) < 0)
+			{
+				dir = fx::invert(dir);
+			}
+
+			const auto new_dir = fx::add(intersection.normal, dir);
+			const auto ray = Ray{ intersection.pos, new_dir };
+			const auto cast = trace_ray(ray);
+
+			out = fx::add(out, cast.color);
+		}
+
+		const auto divisor = 1.f / _options.samples;
+		out = fx::scale(out, divisor);
+
+		return out;
+	}
+
+	Ray Renderer::reflect_intersection(const Intersection& intersection, const Ray& ray) noexcept
+	{
+		// need to ensure that the reflection ray doesn't re-hit the same object due to being inside (floating point inaccuracy)
+		const auto extruded = fx::scale(intersection.normal, .001f);
+		auto pos = fx::add(intersection.pos, extruded);
+
+		const auto gain = intersection.object->roughness;
+		const auto roughness_noise = fx::Random::vec3(-gain, gain);
+		const auto normal = fx::add(intersection.normal, roughness_noise);
+		const auto dir_noise = fx::Random::vec3(-OFFSET, OFFSET);
+
+		auto dir = fx::reflect(ray.dir, normal);
+		//dir = fx::add(dir, dir_noise);
+
+		return Ray{ pos, dir };
 	}
 
 	Intersection Renderer::trace_ray(const Ray& ray) noexcept
@@ -102,6 +171,11 @@ namespace luma
 			return miss();
 		}
 
+#ifdef SIMPLE_SHADOWS
+		const auto scalar = std::clamp(fx::dot(light, intersection.normal), 0.f, 1.0f);
+		intersection.color = fx::scale(intersection.color, scalar);
+#endif
+
 		return intersection;
 	}
 
@@ -112,31 +186,75 @@ namespace luma
 		auto dir = camera.rays[y * camera.width + x];
 		auto pos = camera.pos;
 
-		//static constexpr auto offset = .001f;
-		static constexpr auto offset = .0f;
-
-		const auto noise = fx::Random::vec3(-offset, offset);
+		const auto noise = fx::Random::vec3(-OFFSET, OFFSET);
 		const auto dir_noised = fx::add(dir, noise);
 
-		const auto ray = Ray{ pos, dir_noised };
-		auto intersection = trace_ray(ray);
-
-		if (intersection.object != nullptr)
+		auto compose = [&](auto&& color1, auto&& color2, auto&& reflectivity)
 		{
-			const auto scalar = (fx::dot(light, intersection.normal) + 1) / 2;
-			intersection.color = fx::scale(intersection.color, scalar);
-		}
+			const auto t1 = fx::scale(color1, 1 - reflectivity);
+			const auto t2 = fx::scale(color2, reflectivity);
 
-		const auto first = intersection;
+			const auto total = fx::add(t1, t2);
+			return total;
+		};
 
-		auto fresnel = [&](auto&& intersection)
+		auto tonemap = [&](fx::vec3& color)
 		{
+			auto func = [&](float in)
+			{
+				return 1 - std::exp(-in);
+			};
+
+			color[0] = func(color[0]);
+			color[1] = func(color[1]);
+			color[2] = func(color[2]);
+		};
+
+		auto mix = [&](auto&& color1, auto&& color2, auto&& reflectivity)
+		{
+			const auto color1_squared = fx::multiply(color1, color1);
+			const auto color2_squared = fx::multiply(color2, color2);
+
+			const auto t1 = 1 - reflectivity;
+			const auto t2 = reflectivity;
+
+			const auto a = fx::scale(color1_squared, t1);
+			const auto b = fx::scale(color2_squared, t2);
+
+			const auto total_squared = fx::add(a, b);
+			const auto total = fx::_accumulate<SquareRoot<fx::platform_type>>(total_squared);
+
+			return total;
+		};
+
+		auto lerp = [&](auto&& color1, auto&& color2, auto&& t)
+		{
+			const auto t1 = 1 - t;
+			const auto t2 = t;
+
+			const auto a = fx::scale(color1, t1);
+			const auto b = fx::scale(color2, t2);
+
+			const auto total = fx::add(a, b);
+
+			return total;
+		};
+
+		auto fresnel = [&](auto&& intersection, bool invert)
+		{
+			auto ray = dir_noised;
+
+			if (invert)
+			{
+				ray = fx::invert(ray);
+			}
+
 			// fresnel's law
-			const auto cos_incident = fx::dot(fx::invert(dir_noised), intersection.normal);
+			const auto cos_incident = fx::dot(ray, intersection.normal);
 			const auto coefficient = intersection.metallic;
 			const auto sin_theta_squared = coefficient * coefficient * (1 - (cos_incident * cos_incident));
 			
-			if (sin_theta_squared > 1.)
+			if (sin_theta_squared >= 1.f)
 			{
 				// total internal reflection
 				return 1.f;
@@ -153,90 +271,85 @@ namespace luma
 
 			const auto r = r0 + (1 - r0) * power;
 
-			return r;
+			return 1 - std::clamp(r, 0.f, 1.f);
 		};
 
 
+		Intersection intersection{}, first{};
+
 		for (auto bounce = 0u; bounce < _options.bounces; bounce++)
 		{
+			const auto ray = Ray{ camera.pos, dir };
+			intersection = trace_ray(ray);
+
+			if (bounce == 0)
+			{
+				first = intersection;
+			}
+
 			if (intersection.object == nullptr)
 			{
-				const fx::vec3 sky_color{ .6f, .7f, .9f };
-				
-				const auto miss_contribution = fresnel(intersection);
-				const auto sky = fx::scale(sky_color, miss_contribution);
-				direct = fx::add(direct, sky);
+				const fx::vec3 top_sky_color{ .529f, .808f, .922f };
+				const fx::vec3 bottom_sky_color{ .106f, .275f, .711f };
+
+				const auto clamped = std::clamp(dir[1], -1.f, 1.f);
+				const auto adjusted = (clamped + 1.f) * .5f;
+
+				const auto t = lerp(top_sky_color, bottom_sky_color, adjusted);
+
+				const auto reflectivity = fresnel(intersection, true);
+				direct = mix(direct, t, reflectivity);
 
 				break;
 			}
 
-			const auto hit_contribution = fresnel(intersection);
-			const auto hit = fx::scale(intersection.color, hit_contribution);
-			direct = fx::add(direct, hit);
+			
 
-			const auto extruded = fx::scale(intersection.normal, .001f);
-			pos = fx::add(intersection.pos, extruded);
+			dir = reflect_intersection(intersection, ray).dir;
 
-			const auto gain = intersection.object->roughness;
-			const auto roughness_noise = fx::Random::vec3(-gain, gain);
-			const auto normal = fx::add(intersection.normal, roughness_noise);
-			const auto dir_noise = fx::Random::vec3(-offset, offset);
+			auto reflection = trace_ray(Ray{ intersection.pos, dir });
 
-			dir = fx::reflect(dir, normal);
-			dir = fx::add(dir, dir_noise);
 
-			const auto ray = Ray{ camera.pos, dir };
-			intersection = trace_ray(ray);
+			const auto diffuse = intersection.color;
+			const auto reflected = reflection.color;
+
+			const auto reflectivity = fresnel(intersection, true);
+
+			const auto nonspecular = mix(diffuse, reflected, reflectivity);
+
+			const auto indirect = indirect_illumination(intersection);
+
+
+			const auto t = fx::add(nonspecular, indirect);
+			direct = mix(direct, t, .5f);
+
+			if (intersection.metallic == 0)
+			{
+				break;
+			}
 		}
 
-		if (first != miss())
+		if (first.object != nullptr)
 		{
-			for (auto sample = 0u; sample < _options.samples; sample++)
-			{
-				auto dir = fx::Random::vec3_sphere();
-
-				// ensure the noise points outward
-				if (fx::dot(dir, first.normal) < 0)
-				{
-					dir = fx::invert(dir);
-				}
-
-				const auto new_dir = fx::add(first.normal, dir);
-				const auto ray = Ray{ first.pos, new_dir };
-				const auto cast = trace_ray(ray);
-
-				const auto scalar = 1 / (2 * fx::pi());
-				const auto scaled = fx::scale(cast.color, scalar);
-
-				const auto contribution = fx::scale(scaled, fx::Random::real());
-				indirect = fx::add(indirect, contribution);
-			}
-
-			const auto divisor = 1.f / _options.samples;
-			indirect = fx::scale(indirect, divisor);
+			/*const auto indirect = indirect_illumination(first);
 
 			const auto weight = fx::scale(first.color, 1 / fx::pi());
 			const auto unscaled = fx::add(direct, indirect);
+			result = fx::multiply(unscaled, weight);*/
 
-			result = fx::multiply(unscaled, weight);
+			/*const auto d = first.metallic;
+			const auto i = 1 - d;
+
+			const auto sum = fx::add(fx::scale(direct, d), fx::scale(indirect, i));
+			result = sum;*/
+			result = direct;
 		}
 		
+		// no need to waste time with indirect light no object was hit
 		else
 		{
-			result = first.color;
+			result = direct;
 		}
-
-		auto tonemap = [&](fx::vec3& color)
-		{
-			auto func = [&](float in)
-			{
-				return 1 - std::exp(-in);
-			};
-
-			color[0] = func(color[0]);
-			color[1] = func(color[1]);
-			color[2] = func(color[2]);
-		};
 
 		tonemap(result);
 		return result;
@@ -267,9 +380,9 @@ namespace luma
 		}
 
 	//#pragma omp parallel for
-		for (auto y = 0u; y < height; ++y)
+		for (auto y = 0; y < height; ++y)
 		{
-			for (auto x = 0u; x < width; ++x)
+			for (auto x = 0; x < width; ++x)
 			{
 //#define TESTING
 #ifndef TESTING

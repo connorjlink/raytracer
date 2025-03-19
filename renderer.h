@@ -11,19 +11,24 @@ namespace luma
 		fx::vec3 pos, dir;
 	};
 
+	struct Material
+	{
+		fx::vec3 diffuse;
+		float albedo; // controls the amount of indirect light recieved
+		float metallic; // controls the strength of reflections
+		float roughness; // controls the dispersion of reflections
+	};
+
 	struct Sphere
 	{
 		fx::vec3 pos;
 		float radius;
-
-		fx::vec3 diffuse;
-		float metallic, roughness;
+		Material material;
 	};
+
 
 	struct Intersection
 	{
-		fx::vec3 color;
-		float metallic, roughness;
 		fx::vec3 pos;
 		fx::vec3 normal;
 		float distance, exit;
@@ -45,21 +50,14 @@ namespace luma
 
 		Intersection* closest = nullptr;
 
-		Sphere s{ { 0, 0, -10 }, 2.0f, { 0, 0, 1 }, 0, 0 };
-		Sphere q{ { 4, 0, -10 }, 1.0f, { 0, 1, 0 }, 1, 0 };
-		Sphere r{ { -2, -4, -10 }, 1.0f, { 1, 0, 0 }, 0, 1 };
-		Sphere u{ { -4, -4, -10 }, 1.0f, { 1, 0, 0 }, 0, 0 };
+		Sphere s{ {  0,  0, -10 }, 2.0f, { { 0, 0, 1 }, .5, .00001, 1 } };
+		Sphere q{ {  4,  0, -10 }, 1.0f, { { 0, 1, 0 }, 1, .5, .1 } };
+		Sphere r{ { -2, -4, -10 }, 1.0f, { { 1, 0, 0 }, 1, 1, 1 } };
+		Sphere u{ { -4, -4, -10 }, 1.0f, { { 1, 0, 0 }, .1, .00001, 0 } };
 
-		Sphere a{ { 0, 1002, 0 }, 1000, { 1, 1, 1 }, 0, 0 };
-		Sphere b{ { 1003, 0, 0 }, 1000, { .6, .6, .6 }, 0, 1 };
-		Sphere c{ { 0, 0, 1003 }, 1000, { .6, .6, .6 }, 0, 1 };
-		Sphere d{ { 0, -1003, 0 }, 1000, { .6, .6, .6 }, 0, 1 };
-		Sphere e{ { -1003, 0, 0 }, 1000, { .6, .6, .6 }, 0, 1 };
-		Sphere f{ { 0, 0, -1003 }, 1000, { .6, .6, .6 }, 0, 1 };
+		Sphere a{ { 0, 102, 0 }, 100, { { .6, .6, .6 }, 1, .1, .5 } };
 
-		Sphere t{ { 2, -1, 0 }, 0.5f, { 0, 1, 0 }, 1, 0 };
-
-		std::vector<Sphere> spheres{ s, q, a, r, u };
+		std::vector<Sphere> spheres{ s, a, q, r, u };
 
 		fx::vec3 light{ -1, -1, 0 };
 

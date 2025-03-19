@@ -98,14 +98,19 @@ namespace luma
 		const auto forward = fx::normalize(fx::vec3{ dir[0], 0.f, dir[2] });
 		const auto right = fx::cross(forward, up);
 
-			 if (pge.GetKey(olc::Key::W).bHeld) { pos = fx::add(pos, fx::scale(forward, movement_speed * ts)); moved = true; }
-		else if (pge.GetKey(olc::Key::S).bHeld) { pos = fx::subtract(pos, fx::scale(forward, movement_speed * ts)); moved = true; }
 
-			 if (pge.GetKey(olc::Key::A).bHeld) { pos = fx::subtract(pos, fx::scale(right, movement_speed * ts)); moved = true; }
-		else if (pge.GetKey(olc::Key::D).bHeld) { pos = fx::add(pos, fx::scale(right, movement_speed * ts)); moved = true; }
+		auto fly_speed = movement_speed;
 
-			 if (pge.GetKey(olc::Key::Q).bHeld) { pos = fx::add(pos, fx::scale(up, movement_speed * ts)); moved = true; }
-		else if (pge.GetKey(olc::Key::E).bHeld) { pos = fx::subtract(pos, fx::scale(up, movement_speed * ts)); moved = true; }
+		if (pge.GetKey(olc::Key::SHIFT).bHeld) { fly_speed *= 10.f; }
+
+			 if (pge.GetKey(olc::Key::W).bHeld) { pos = fx::add(pos, fx::scale(forward, fly_speed * ts)); moved = true; }
+		else if (pge.GetKey(olc::Key::S).bHeld) { pos = fx::subtract(pos, fx::scale(forward, fly_speed * ts)); moved = true; }
+
+			 if (pge.GetKey(olc::Key::A).bHeld) { pos = fx::subtract(pos, fx::scale(right, fly_speed * ts)); moved = true; }
+		else if (pge.GetKey(olc::Key::D).bHeld) { pos = fx::add(pos, fx::scale(right, fly_speed * ts)); moved = true; }
+
+			 if (pge.GetKey(olc::Key::Q).bHeld) { pos = fx::add(pos, fx::scale(up, fly_speed * ts)); moved = true; }
+		else if (pge.GetKey(olc::Key::E).bHeld) { pos = fx::subtract(pos, fx::scale(up, fly_speed * ts)); moved = true; }
 
 			 if (pge.GetKey(olc::Key::UP).bHeld)   { pitch += rotation_speed * ts; moved = true; }
 		else if (pge.GetKey(olc::Key::DOWN).bHeld) { pitch -= rotation_speed * ts; moved = true; }

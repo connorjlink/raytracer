@@ -1,6 +1,9 @@
 #ifndef LUMA_ARGUMENTS_H
 #define LUMA_ARGUMENTS_H
 
+// arguments.h
+// (c) 2025 Connor J. Link. All Rights Reserved.
+
 namespace luma
 {
 	enum class RenderMode
@@ -18,7 +21,7 @@ namespace luma
 	struct Options
 	{
 		std::uint32_t width, height;
-		std::uint32_t samples, bounces;
+		std::uint32_t samples, bounces, paths;
 		RenderMode mode;
 	};
 

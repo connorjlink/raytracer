@@ -19,6 +19,9 @@
     <Filter Include="Module Source Files">
       <UniqueIdentifier>{e5f55705-8575-4f14-a840-f4010bd4e767}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Module Header Files">
+      <UniqueIdentifier>{31ee5ffc-adbd-4832-8ca3-56f385bee386}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arguments.cpp">
@@ -76,6 +79,27 @@
     </ClInclude>
     <ClInclude Include="olcPixelGameEngine.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="flux\vector.h">
+      <Filter>Module Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="flux\types.h">
+      <Filter>Module Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="flux\timer.h">
+      <Filter>Module Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="flux\random.h">
+      <Filter>Module Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="flux\matrix.h">
+      <Filter>Module Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="flux\float.h">
+      <Filter>Module Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="flux\base.h">
+      <Filter>Module Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

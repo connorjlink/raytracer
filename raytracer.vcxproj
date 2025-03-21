@@ -108,6 +108,7 @@
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <BuildStlModules>true</BuildStlModules>
       <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,6 +135,7 @@
       <EnableEnhancedInstructionSet>CPUExtensionRequirementsARMv88</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,6 +157,7 @@
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -181,6 +184,7 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -200,6 +204,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BuildStlModules>true</BuildStlModules>
       <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -226,6 +231,7 @@
       <EnableEnhancedInstructionSet>CPUExtensionRequirementsARMv88</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -243,6 +249,8 @@
     <ClCompile Include="flux\test.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="flux\timer.cpp" />
     <ClCompile Include="image.cpp" />
@@ -254,6 +262,13 @@
     <ClInclude Include="application.h" />
     <ClInclude Include="arguments.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="flux\base.h" />
+    <ClInclude Include="flux\float.h" />
+    <ClInclude Include="flux\matrix.h" />
+    <ClInclude Include="flux\random.h" />
+    <ClInclude Include="flux\timer.h" />
+    <ClInclude Include="flux\types.h" />
+    <ClInclude Include="flux\vector.h" />
     <ClInclude Include="image.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="olcPixelGameEngine.h" />

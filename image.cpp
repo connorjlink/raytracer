@@ -3,6 +3,9 @@ import std;
 #include "image.h"
 #include "log.h"
 
+// image.cpp
+// (c) 2025 Connor J. Link. All Rights Reserved.
+
 namespace luma
 {
 	Image::Image(std::int32_t width, std::int32_t height, bool allocate) noexcept

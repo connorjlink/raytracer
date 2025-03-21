@@ -9,6 +9,9 @@ import std;
 #include "renderer.h"
 #include "arguments.h"
 
+// renderer.cpp
+// (c) 2025 Connor J. Link. All Rights Reserved.
+
 namespace
 {
 	template<typename T>
@@ -182,7 +185,13 @@ namespace luma
 	{
 		fx::vec3 out{};
 
-		for (auto sample = 0u; sample < _options.samples; sample++)
+		// TODO: dynamically dispatch a different render function so as to not waste a comparison every pixel
+		if (_options.mode != RenderMode::PATHTRACE)
+		{
+			return out;
+		}
+
+		for (auto sample = 0u; sample < _options.paths; sample++)
 		{
 			auto dir = fx::Random::vec3_sphere();
 
@@ -317,10 +326,6 @@ namespace luma
 			const auto inverted = fx::invert(dir);
 			const auto cos_theta = fx::dot(inverted, intersection.normal);
 
-			if (bounce == 0)
-			{
-			}
-			
 			if (cos_theta >= 0)
 			{
 				auto indirect = fx::broadcast<3>(0.f);
@@ -331,16 +336,13 @@ namespace luma
 				}
 
 				const auto value = ((cos_theta + 1.f) * .5f);
-				//const auto value = std::clamp(cos_theta, 0.f, 1.f);
 
 				const auto scalar = value * (1 - material.metallic);
 				const auto capture = lerp(diffuse, indirect, 1- scalar);
 				const auto scaled = fx::scale(capture, scalar);
 
 				direct = fx::add(direct, capture);
-
 			}
-
 
 
 			if (material.metallic == 0)
@@ -389,7 +391,16 @@ namespace luma
 #ifndef TESTING
 				auto index = (y * width) + x;
 
-				const auto result = render_pixel(x, y);
+				fx::vec3 result{};
+
+				for (auto i = 0; i < _options.samples; i++)
+				{
+					const auto iteration = render_pixel(x, y);
+					result = fx::add(result, iteration);
+				}
+
+				const auto divisor = fx::native(1) / _options.samples;
+				result = fx::scale(result, divisor);
 				
 				auto& data = accumulated_data[index];
 				data = fx::add(data, result);

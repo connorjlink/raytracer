@@ -3,6 +3,9 @@ import std;
 #include "arguments.h"
 #include "log.h"
 
+// arguments.cpp
+// (c) 2025 Connor J. Link. All Rights Reserved.
+
 namespace
 {
 	std::vector<std::string> split(std::string text, const std::string& delimiter)
@@ -68,6 +71,7 @@ namespace
 		MODE,
 		SAMPLES,
 		BOUNCES,
+		PATHS,
 	};
 
 	static const std::unordered_map<std::string, ArgumentType> _arguments_map
@@ -77,6 +81,7 @@ namespace
 		{ "mode", ArgumentType::MODE },
 		{ "bounces", ArgumentType::BOUNCES },
 		{ "samples", ArgumentType::SAMPLES },
+		{ "paths", ArgumentType::PATHS },
 	};
 }
 
@@ -167,6 +172,26 @@ namespace luma
 						}
 
 						_options.bounces = result;
+					} break;
+
+					case PATHS:
+					{
+						if (_options.mode != RenderMode::PATHTRACE)
+						{
+							// warn about arguments but keep processing in case the render mode is set afterwards on the command line
+							warning(std::format("path count `{}` will be ignored if render mode is not set to \"pathtrace\"", value));
+						}
+
+						const auto [success, result] = parse_integer(value);
+
+						if (!success)
+						{
+							log(std::format("unrecognized path count `{}`", value));
+							continue;
+						}
+
+						_options.paths = result;
+
 					} break;
 
 					case MODE:

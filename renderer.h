@@ -4,6 +4,9 @@
 #include "flux/types.h"
 #include "camera.h"
 
+// renderer.h
+// (c) 2025 Connor J. Link. All Rights Reserved.
+
 namespace luma
 {
 	struct Ray
@@ -54,10 +57,11 @@ namespace luma
 		Sphere q{ {  4,  0, -10 }, 1.0f, { { 0, 1, 0 }, 1, .5, .1 } };
 		Sphere r{ { -2, -4, -10 }, 1.0f, { { 1, 0, 0 }, 1, 1, 1 } };
 		Sphere u{ { -4, -4, -10 }, 1.0f, { { 1, 0, 0 }, .1, .00001, 0 } };
+		Sphere t{ {  2, -4, -10 }, 1.0f, { { 1, 0, 1 }, 1, 1, 0 } };
 
 		Sphere a{ { 0, 102, 0 }, 100, { { .6, .6, .6 }, 1, .1, .5 } };
 
-		std::vector<Sphere> spheres{ s, a, q, r, u };
+		std::vector<Sphere> spheres{ s, a, q, r, u, t };
 
 		fx::vec3 light{ -1, -1, 0 };
 

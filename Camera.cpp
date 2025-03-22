@@ -91,9 +91,9 @@ namespace luma
 
 	bool Camera::update(float ts, olc::PixelGameEngine& pge) noexcept
 	{
-		static constexpr auto movement_speed = .01f;
-		static constexpr auto look_speed = .02f;
-		static constexpr auto rotation_speed = .003f;
+		static constexpr auto movement_speed = .005f;
+		static constexpr auto look_speed = .005f;
+		static constexpr auto rotation_speed = .001f;
 
 		moved = false;
 
@@ -121,6 +121,10 @@ namespace luma
 			 if (pge.GetKey(olc::Key::LEFT).bHeld)  { yaw += rotation_speed * ts; moved = true; }
 		else if (pge.GetKey(olc::Key::RIGHT).bHeld) { yaw -= rotation_speed * ts; moved = true; }
 
+			 if (pge.GetKey(olc::Key::R).bHeld) { depth += rotation_speed * ts; moved = true; }
+		else if (pge.GetKey(olc::Key::F).bHeld) { depth -= rotation_speed * ts; moved = true; }
+
+			 if (pge.GetKey(olc::Key::T).bPressed) { show_depth = !show_depth;  }
 
 		/*const float Δpitch = -Δmouse.y * rotation_speed,
 					    Δyaw   = +Δmouse.x * rotation_speed;*/
@@ -142,7 +146,7 @@ namespace luma
 		{
 			 (base[0]             * cos_yaw                       + base[2]             * sin_yaw),
 			-(base[0] * sin_pitch * sin_yaw + base[1] * cos_pitch - base[2] * sin_pitch * cos_yaw),
-			-(base[0] * cos_pitch * sin_yaw + base[1] * sin_pitch + base[2] * cos_pitch * cos_yaw),
+			 (base[0] * cos_pitch * sin_yaw + base[1] * sin_pitch + base[2] * cos_pitch * cos_yaw),
 		};
 
 

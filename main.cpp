@@ -38,12 +38,12 @@ public:
 		framebuffer = new std::uint32_t[ScreenWidth() * ScreenHeight()];
 
 		// set up some sensible defaults in case the command line arguments are missing or incomplete
-		luma::_options.width = ScreenWidth();
+		/*luma::_options.width = ScreenWidth();
 		luma::_options.height = ScreenHeight();
 		luma::_options.bounces = 2;
 		luma::_options.samples = 2;
 		luma::_options.paths = 1;
-		luma::_options.mode = luma::RenderMode::PATHTRACE;
+		luma::_options.mode = luma::RenderMode::PATHTRACE;*/
 
 		return true;
 	}
@@ -79,8 +79,9 @@ public:
 		const auto& dir = renderer.camera.dir;
 		const auto& right = renderer.camera.right;
 
-		DrawStringDecal({ 1.f, 1.f }, std::format("Forward: ({}, {}, {})", dir[0], dir[1], dir[2]));
-		DrawStringDecal({ 1.f, 10.f }, std::format("Right: ({}, {}, {})", right[0], right[1], right[2]));
+		/*DrawStringDecal({ 1.f, 1.f }, std::format("Forward: ({}, {}, {})", dir[0], dir[1], dir[2]));
+		DrawStringDecal({ 1.f, 11.f }, std::format("Right: ({}, {}, {})", right[0], right[1], right[2]));
+		DrawStringDecal({ 1.f, 21.f }, std::format("Depth: {}", renderer.camera.depth));*/
 
 		//std::this_thread::sleep_for(200ms);
 
@@ -94,7 +95,7 @@ int main(int argc, char** argv)
 	arguments.parse(argc, argv);
 
 	Luma demo{};
-	if (demo.Construct(500, 500, 1, 1, false, false, true, true))
+	if (demo.Construct(1584, 396, 1, 1, false, false, true, true))
 		demo.Start();
 
 	return 0;

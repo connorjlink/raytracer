@@ -288,18 +288,20 @@ namespace luma
 		return intersection;
 	}
 
-	fx::vec3 Renderer::render_pixel(std::uint32_t x, std::uint32_t y) noexcept
+	PixelResult Renderer::render_pixel(std::uint32_t x, std::uint32_t y, fx::platform_type blur) noexcept
 	{
 		fx::vec3 direct{}, indirect{}, result{};
 
 		auto dir = camera.rays[y * camera.width + x];
 		auto pos = camera.pos;
 
+		auto depth = std::numeric_limits<float>::max();
+
 		Intersection intersection{};
 
 		for (auto bounce = 0u; bounce < _options.bounces; bounce++)
 		{
-			const auto dir_noised = noise(dir);
+			const auto dir_noised = noise(dir, blur);
 			const auto ray = Ray{ camera.pos, dir_noised };
 			intersection = trace_ray(ray);
 
@@ -308,7 +310,7 @@ namespace luma
 				const fx::vec3 top_sky_color{ .529f, .808f, .922f };
 				const fx::vec3 bottom_sky_color{ .106f, .275f, .711f };
 
-				const auto clamped = std::clamp(dir[1], -1.f, 1.f);
+				const auto clamped = std::clamp(dir_noised[1], -1.f, 1.f);
 				const auto adjusted = (clamped + 1.f) * .5f;
 
 				const auto sky = ::lerp(top_sky_color, bottom_sky_color, adjusted);
@@ -318,12 +320,17 @@ namespace luma
 				break;
 			}
 
+			if (bounce == 0)
+			{
+				depth = intersection.distance;
+			}
+
 			const auto object = intersection.object;
 			const auto& material = object->material;
 			
 			const auto diffuse = material.diffuse;
 
-			const auto inverted = fx::invert(dir);
+			const auto inverted = fx::invert(dir_noised);
 			const auto cos_theta = fx::dot(inverted, intersection.normal);
 
 			if (cos_theta >= 0)
@@ -338,10 +345,10 @@ namespace luma
 				const auto value = ((cos_theta + 1.f) * .5f);
 
 				const auto scalar = value * (1 - material.metallic);
-				const auto capture = lerp(diffuse, indirect, 1- scalar);
-				const auto scaled = fx::scale(capture, scalar);
+				const auto capture = lerp(diffuse, indirect, 1 - scalar);
+				const auto scaled = fx::scale(capture, scalar * .8f);
 
-				direct = fx::add(direct, capture);
+				direct = fx::add(direct, scaled);
 			}
 
 
@@ -355,7 +362,7 @@ namespace luma
 		}
 
 		result = ::tonemap(direct);
-		return result;
+		return { result, depth };
 	}
 
 	void Renderer::render_to(std::uint32_t* target, olc::PixelGameEngine& pge) noexcept
@@ -393,14 +400,48 @@ namespace luma
 
 				fx::vec3 result{};
 
-				for (auto i = 0; i < _options.samples; i++)
+				// TODO: reincorporate pixel sampling
+				//for (auto i = 0; i < _options.samples; i++)
+				//{
+				// result = fx::add(result, iteration.output);
+				//}
+				// const auto divisor = fx::native(1) / _options.samples;
+				// result = fx::scale(result, divisor);
+
+				//const auto initial_sample = render_pixel(x, y);
+
+				auto dir = camera.rays[y * camera.width + x];
+				auto pos = camera.pos;
+
+				const auto ray = Ray{ pos, dir };
+
+				const auto intersection = trace_ray(ray);
+				auto depth = std::numeric_limits<float>::max();
+				if (intersection.object != nullptr)
 				{
-					const auto iteration = render_pixel(x, y);
-					result = fx::add(result, iteration);
+					depth = intersection.distance;
 				}
 
-				const auto divisor = fx::native(1) / _options.samples;
-				result = fx::scale(result, divisor);
+				const auto depth_difference = depth - camera.depth;
+
+				auto focus = 1 - std::exp(-std::pow(depth_difference, 10));
+
+				const auto focused_blur = .001f;
+				const auto defocused_blur = .03f;
+
+				const auto blur = std::lerp(focused_blur, defocused_blur, focus);
+
+				const auto real_sample = render_pixel(x, y, blur);
+				result = real_sample.output;
+				
+				if (camera.show_depth)
+				{
+					if (focus < .5f)
+					{
+						result = fx::scale(result, 1.2f);
+					}
+				}
+				
 				
 				auto& data = accumulated_data[index];
 				data = fx::add(data, result);

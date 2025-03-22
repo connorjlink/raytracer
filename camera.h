@@ -30,6 +30,10 @@ namespace luma
 
 		float pitch = 0.f, yaw = 0.f;
 
+		float depth = 10.f;
+
+		bool show_depth = true;
+
 		fx::vec3 pos{ 0.0f, 0.5f, 5.0f },
 				 dir{ 0.0f, 0.0f, 1.0f }, right{};
 

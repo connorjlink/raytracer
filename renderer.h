@@ -4,11 +4,20 @@
 #include "flux/types.h"
 #include "camera.h"
 
+// renderer.h
+// (c) 2025 Connor J. Link. All Rights Reserved.
+
 namespace luma
 {
 	struct Ray
 	{
 		fx::vec3 pos, dir;
+	};
+
+	struct PixelResult
+	{
+		fx::vec3 output;
+		fx::platform_type depth;
 	};
 
 	struct Material
@@ -50,14 +59,15 @@ namespace luma
 
 		Intersection* closest = nullptr;
 
-		Sphere s{ {  0,  0, -10 }, 2.0f, { { 0, 0, 1 }, .5, .00001, 1 } };
-		Sphere q{ {  4,  0, -10 }, 1.0f, { { 0, 1, 0 }, 1, .5, .1 } };
-		Sphere r{ { -2, -4, -10 }, 1.0f, { { 1, 0, 0 }, 1, 1, 1 } };
-		Sphere u{ { -4, -4, -10 }, 1.0f, { { 1, 0, 0 }, .1, .00001, 0 } };
+		Sphere s{ {  0, .5f, -10 }, 1.0f, { { 0, 0, 1 }, 1, .001f, .4 } };
+		Sphere q{ {  3, .5f, -10 }, 1.0f, { { 0, 1, 0 }, 1, .001f, .4 } };
+		Sphere r{ {  6, .5f, -10 }, 1.0f, { { 1, 0, 0 }, 1, .001f, .4 } };
+
+		Sphere t{ {  3, .5f, -23 }, 10.0f, { { 1, 1, 1 }, 1, .4f, 0 } };
 
 		Sphere a{ { 0, 102, 0 }, 100, { { .6, .6, .6 }, 1, .1, .5 } };
 
-		std::vector<Sphere> spheres{ s, a, q, r, u };
+		std::vector<Sphere> spheres{ s, a, q, r, t };
 
 		fx::vec3 light{ -1, -1, 0 };
 
@@ -71,7 +81,7 @@ namespace luma
 		fx::vec3 indirect_illumination(const Intersection&) noexcept;
 		Ray reflect_intersection(const Intersection&, const Ray&) noexcept;
 		Intersection trace_ray(const Ray&) noexcept;
-		fx::vec3 render_pixel(std::uint32_t, std::uint32_t) noexcept;
+		PixelResult render_pixel(std::uint32_t, std::uint32_t, fx::platform_type = .001f) noexcept;
 	};
 }
 

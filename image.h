@@ -1,6 +1,9 @@
 #ifndef LUMA_IMAGE_H
 #define LUMA_IMAGE_H
 
+// image.h
+// (c) 2025 Connor J. Link. All Rights Reserved.
+
 namespace luma
 {
 	class Image

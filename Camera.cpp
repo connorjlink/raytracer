@@ -6,6 +6,9 @@
 
 #include "camera.h"
 
+// camera.cpp
+// (c) 2025 Connor J. Link. All Rights Reserved.
+
 namespace
 {
 	constexpr fx::mat4 inverse(fx::mat4& matrix)
@@ -88,15 +91,15 @@ namespace luma
 
 	bool Camera::update(float ts, olc::PixelGameEngine* pge_ptr) noexcept
 	{
-		static constexpr auto movement_speed = .01f;
-		static constexpr auto look_speed = .02f;
-		static constexpr auto rotation_speed = .003f;
+		static constexpr auto movement_speed = .005f;
+		static constexpr auto look_speed = .005f;
+		static constexpr auto rotation_speed = .001f;
 
 		moved = false;
 
 		const fx::vec3 up{ 0.f, 1.f, 0.f };
-		const auto forward = fx::normalize(fx::vec3{ dir[0], 0.f, dir[2] });
-		const auto right = fx::cross(forward, up);
+		const auto forward = fx::normalize(fx::vec3{ -dir[0], 0.f, dir[2] });
+		right = fx::cross(forward, up);
 
 
 		auto fly_speed = movement_speed;
@@ -113,14 +116,16 @@ namespace luma
 				 if (pge.GetKey(olc::Key::A).bHeld) { pos = fx::subtract(pos, fx::scale(right, fly_speed * ts)); moved = true; }
 			else if (pge.GetKey(olc::Key::D).bHeld) { pos = fx::add(pos, fx::scale(right, fly_speed * ts)); moved = true; }
 
-				 if (pge.GetKey(olc::Key::Q).bHeld) { pos = fx::add(pos, fx::scale(up, fly_speed * ts)); moved = true; }
-			else if (pge.GetKey(olc::Key::E).bHeld) { pos = fx::subtract(pos, fx::scale(up, fly_speed * ts)); moved = true; }
-
-				 if (pge.GetKey(olc::Key::UP).bHeld) { pitch += rotation_speed * ts; moved = true; }
-			else if (pge.GetKey(olc::Key::DOWN).bHeld) { pitch -= rotation_speed * ts; moved = true; }
-
-				 if (pge.GetKey(olc::Key::LEFT).bHeld) { yaw -= rotation_speed * ts; moved = true; }
-			else if (pge.GetKey(olc::Key::RIGHT).bHeld) { yaw += rotation_speed * ts; moved = true; }
+				 if (pge.GetKey(olc::Key::UP).bHeld)   { pitch -= rotation_speed * ts; moved = true; }
+			else if (pge.GetKey(olc::Key::DOWN).bHeld) { pitch += rotation_speed * ts; moved = true; }
+			
+				 if (pge.GetKey(olc::Key::LEFT).bHeld)  { yaw += rotation_speed * ts; moved = true; }
+			else if (pge.GetKey(olc::Key::RIGHT).bHeld) { yaw -= rotation_speed * ts; moved = true; }
+			
+				 if (pge.GetKey(olc::Key::R).bHeld) { depth += rotation_speed * ts; moved = true; }
+			else if (pge.GetKey(olc::Key::F).bHeld) { depth -= rotation_speed * ts; moved = true; }
+			
+				 if (pge.GetKey(olc::Key::T).bPressed) { show_depth = !show_depth;  }
 		}
 
 		/*const float Δpitch = -Δmouse.y * rotation_speed,
@@ -137,11 +142,13 @@ namespace luma
 
 		const auto base = fx::vec3{ 0.f, 0.f, -1.0f };
 
+		// TODO: add quaternion system to 
+
 		dir =
 		{
-			 base[0]             * cos_yaw                       + base[2]             * sin_yaw,
-			 base[0] * sin_pitch * sin_yaw + base[1] * cos_pitch - base[2] * sin_pitch * cos_yaw,
-			-base[0] * cos_pitch * sin_yaw + base[1] * sin_pitch + base[2] * cos_pitch * cos_yaw,
+			 (base[0]             * cos_yaw                       + base[2]             * sin_yaw),
+			-(base[0] * sin_pitch * sin_yaw + base[1] * cos_pitch - base[2] * sin_pitch * cos_yaw),
+			 (base[0] * cos_pitch * sin_yaw + base[1] * sin_pitch + base[2] * cos_pitch * cos_yaw),
 		};
 
 

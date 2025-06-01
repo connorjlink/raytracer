@@ -1,12 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35617.110 d17.13
+VisualStudioVersion = 17.13.35617.110
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "raytracer", "raytracer.vcxproj", "{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "luma", "..\luma\luma.csproj", "{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Connected|ARM64 = Connected|ARM64
+		Connected|x64 = Connected|x64
+		Connected|x86 = Connected|x86
 		Debug|ARM64 = Debug|ARM64
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
@@ -15,6 +20,12 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Connected|ARM64.ActiveCfg = Debug|ARM64
+		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Connected|ARM64.Build.0 = Debug|ARM64
+		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Connected|x64.ActiveCfg = Release|x64
+		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Connected|x64.Build.0 = Release|x64
+		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Connected|x86.ActiveCfg = Debug|Win32
+		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Connected|x86.Build.0 = Debug|Win32
 		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Debug|ARM64.ActiveCfg = Debug|ARM64
 		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Debug|ARM64.Build.0 = Debug|ARM64
 		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Debug|x64.ActiveCfg = Debug|x64
@@ -27,6 +38,33 @@ Global
 		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Release|x64.Build.0 = Release|x64
 		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Release|x86.ActiveCfg = Release|Win32
 		{63FA6EAB-34E1-495A-BB84-7CBF069E81B7}.Release|x86.Build.0 = Release|Win32
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Connected|ARM64.ActiveCfg = Debug|ARM64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Connected|ARM64.Build.0 = Debug|ARM64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Connected|ARM64.Deploy.0 = Debug|ARM64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Connected|x64.ActiveCfg = Debug|x64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Connected|x64.Build.0 = Debug|x64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Connected|x64.Deploy.0 = Debug|x64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Connected|x86.ActiveCfg = Debug|x86
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Connected|x86.Build.0 = Debug|x86
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Connected|x86.Deploy.0 = Debug|x86
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Debug|ARM64.Build.0 = Debug|ARM64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Debug|x64.ActiveCfg = Debug|x64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Debug|x64.Build.0 = Debug|x64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Debug|x64.Deploy.0 = Debug|x64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Debug|x86.ActiveCfg = Debug|x86
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Debug|x86.Build.0 = Debug|x86
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Debug|x86.Deploy.0 = Debug|x86
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Release|ARM64.ActiveCfg = Release|ARM64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Release|ARM64.Build.0 = Release|ARM64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Release|ARM64.Deploy.0 = Release|ARM64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Release|x64.ActiveCfg = Release|x64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Release|x64.Build.0 = Release|x64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Release|x64.Deploy.0 = Release|x64
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Release|x86.ActiveCfg = Release|x86
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Release|x86.Build.0 = Release|x86
+		{A4376324-77D3-4A8A-A3D4-F2C7B6CCA8D1}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

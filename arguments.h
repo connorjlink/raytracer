@@ -15,18 +15,30 @@ namespace luma
 		{ "pathtrace", RenderMode::PATHTRACE },
 	};
 
+	enum class Context
+	{
+		INTERACTIVE,
+		HEADLESS,
+	};
+
+	static const std::unordered_map<std::string, Context> _context_map
+	{
+		{ "interative", Context::INTERACTIVE },
+		{ "headless", Context::HEADLESS },
+	};
+
 	struct Options
 	{
 		std::uint32_t width, height;
 		std::uint32_t samples, bounces;
 		RenderMode mode;
+		Context context = Context::INTERACTIVE;
 	};
 
 	extern Options _options;
 
 	class Arguments
 	{
-	private:
 	public:
 		void parse(int, char**);
 	};

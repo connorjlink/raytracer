@@ -356,7 +356,7 @@ namespace luma
 		return result;
 	}
 
-	void Renderer::render_to(std::uint32_t* target, olc::PixelGameEngine& pge) noexcept
+	void Renderer::render_to(std::uint32_t* target, olc::PixelGameEngine* pge) noexcept
 	{
 		fx::Timer timer{};
 
@@ -381,9 +381,9 @@ namespace luma
 		}
 
 	//#pragma omp parallel for
-		for (auto y = 0; y < height; ++y)
+		for (auto y = 0u; y < height; ++y)
 		{
-			for (auto x = 0; x < width; ++x)
+			for (auto x = 0u; x < width; ++x)
 			{
 //#define TESTING
 #ifndef TESTING

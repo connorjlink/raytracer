@@ -14,7 +14,8 @@ namespace luma
 
 	public:
 		void shadow_from(std::uint32_t*) noexcept;
-		void export_to(const std::string&) noexcept;
+		void export_to_ppm(const std::string&) noexcept;
+		void export_to_bmp(const std::string&) noexcept;
 	};
 }
 

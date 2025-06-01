@@ -68,6 +68,7 @@ namespace
 		MODE,
 		SAMPLES,
 		BOUNCES,
+		CONTEXT,
 	};
 
 	static const std::unordered_map<std::string, ArgumentType> _arguments_map
@@ -77,6 +78,7 @@ namespace
 		{ "mode", ArgumentType::MODE },
 		{ "bounces", ArgumentType::BOUNCES },
 		{ "samples", ArgumentType::SAMPLES },
+		{ "context", ArgumentType::CONTEXT },
 	};
 }
 
@@ -178,6 +180,17 @@ namespace luma
 						}
 
 						_options.mode = _render_mode_map.at(value);
+					} break;
+
+					case CONTEXT:
+					{
+						if (!_context_map.contains(value))
+						{
+							log(std::format("unrecognized context `{}`", value));
+							continue;
+						}
+
+						_options.context = _context_map.at(value);
 					} break;
 
 					default:

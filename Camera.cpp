@@ -86,7 +86,7 @@ namespace luma
 		recompute_rays();
 	}
 
-	bool Camera::update(float ts, olc::PixelGameEngine& pge) noexcept
+	bool Camera::update(float ts, olc::PixelGameEngine* pge_ptr) noexcept
 	{
 		static constexpr auto movement_speed = .01f;
 		static constexpr auto look_speed = .02f;
@@ -101,23 +101,27 @@ namespace luma
 
 		auto fly_speed = movement_speed;
 
-		if (pge.GetKey(olc::Key::SHIFT).bHeld) { fly_speed *= 10.f; }
+		if (pge_ptr)
+		{
+			auto& pge = *pge_ptr;
 
-			 if (pge.GetKey(olc::Key::W).bHeld) { pos = fx::add(pos, fx::scale(forward, fly_speed * ts)); moved = true; }
-		else if (pge.GetKey(olc::Key::S).bHeld) { pos = fx::subtract(pos, fx::scale(forward, fly_speed * ts)); moved = true; }
+				 if (pge.GetKey(olc::Key::SHIFT).bHeld) { fly_speed *= 10.f; }
 
-			 if (pge.GetKey(olc::Key::A).bHeld) { pos = fx::subtract(pos, fx::scale(right, fly_speed * ts)); moved = true; }
-		else if (pge.GetKey(olc::Key::D).bHeld) { pos = fx::add(pos, fx::scale(right, fly_speed * ts)); moved = true; }
+				 if (pge.GetKey(olc::Key::W).bHeld) { pos = fx::add(pos, fx::scale(forward, fly_speed * ts)); moved = true; }
+			else if (pge.GetKey(olc::Key::S).bHeld) { pos = fx::subtract(pos, fx::scale(forward, fly_speed * ts)); moved = true; }
 
-			 if (pge.GetKey(olc::Key::Q).bHeld) { pos = fx::add(pos, fx::scale(up, fly_speed * ts)); moved = true; }
-		else if (pge.GetKey(olc::Key::E).bHeld) { pos = fx::subtract(pos, fx::scale(up, fly_speed * ts)); moved = true; }
+				 if (pge.GetKey(olc::Key::A).bHeld) { pos = fx::subtract(pos, fx::scale(right, fly_speed * ts)); moved = true; }
+			else if (pge.GetKey(olc::Key::D).bHeld) { pos = fx::add(pos, fx::scale(right, fly_speed * ts)); moved = true; }
 
-			 if (pge.GetKey(olc::Key::UP).bHeld)   { pitch += rotation_speed * ts; moved = true; }
-		else if (pge.GetKey(olc::Key::DOWN).bHeld) { pitch -= rotation_speed * ts; moved = true; }
+				 if (pge.GetKey(olc::Key::Q).bHeld) { pos = fx::add(pos, fx::scale(up, fly_speed * ts)); moved = true; }
+			else if (pge.GetKey(olc::Key::E).bHeld) { pos = fx::subtract(pos, fx::scale(up, fly_speed * ts)); moved = true; }
 
-			 if (pge.GetKey(olc::Key::LEFT).bHeld)  { yaw -= rotation_speed * ts; moved = true; }
-		else if (pge.GetKey(olc::Key::RIGHT).bHeld) { yaw += rotation_speed * ts; moved = true; }
+				 if (pge.GetKey(olc::Key::UP).bHeld) { pitch += rotation_speed * ts; moved = true; }
+			else if (pge.GetKey(olc::Key::DOWN).bHeld) { pitch -= rotation_speed * ts; moved = true; }
 
+				 if (pge.GetKey(olc::Key::LEFT).bHeld) { yaw -= rotation_speed * ts; moved = true; }
+			else if (pge.GetKey(olc::Key::RIGHT).bHeld) { yaw += rotation_speed * ts; moved = true; }
+		}
 
 		/*const float Δpitch = -Δmouse.y * rotation_speed,
 					    Δyaw   = +Δmouse.x * rotation_speed;*/

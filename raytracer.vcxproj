@@ -245,7 +245,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application.cpp" />
     <ClCompile Include="arguments.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="flux\implementation.cpp" />

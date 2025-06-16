@@ -1,11 +1,23 @@
-﻿import std;
+﻿#include <cstdint>
+#include <chrono>
+#include <functional>
+#include <map>
+#include <print>
+#include <filesystem>
+#include <array>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <thread>
 
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 #include "arguments.h"
-#include "application.h"
 #include "image.h"
 #include "renderer.h"
+#include "gpu.h"
+
+#include <windows.h>
 
 // main.cpp
 // (c) 2025 Connor J. Link. All Rights Reserved.
@@ -39,7 +51,6 @@ public:
 	}
 
 private:
-	luma::Application application;
 	luma::Renderer renderer;
 	luma::Image image;
 	std::uint32_t* framebuffer;
@@ -47,7 +58,6 @@ private:
 public:
 	bool OnUserCreate() override
 	{
-		application = {};
 		renderer = {};
 
 		framebuffer = new std::uint32_t[ScreenWidth() * ScreenHeight()];
@@ -67,7 +77,7 @@ public:
 	{
 		renderer.render_to(framebuffer, this);
 
-		for (auto x = 0; x < ScreenWidth(); x++)
+		/*for (auto x = 0; x < ScreenWidth(); x++)
 		{
 			for (auto y = 0; y < ScreenHeight(); y++)
 			{
@@ -80,7 +90,7 @@ public:
 				const olc::Pixel pixel{ red, green, blue };
 				Draw(x, y, pixel);
 			}
-		}
+		}*/
 
 		if (GetKey(olc::Key::CTRL).bHeld)
 		{
@@ -112,10 +122,102 @@ public:
 	}
 };
 
-int main(int argc, char** argv)
+inline std::string LPWSTR_to_string(LPWSTR wstr)
 {
+	if (!wstr) 
+		return {};
+
+	int size_needed = WideCharToMultiByte(
+		CP_UTF8, 0, wstr, -1, nullptr, 0, nullptr, nullptr);
+
+	if (size_needed <= 0)
+		return {};
+
+	std::string result(size_needed - 1, 0);
+
+	WideCharToMultiByte(
+		CP_UTF8, 0, wstr, -1, result.data(), size_needed, nullptr, nullptr);
+
+	return result;
+}
+
+inline std::vector<std::string> ConvertArgvWToArgvA(LPWSTR* argvw, int argc)
+{
+	std::vector<std::string> result{};
+	result.reserve(argc);
+
+	for (int i = 0; i < argc; ++i)
+	{
+		int size_needed = WideCharToMultiByte(
+			CP_UTF8, 0, argvw[i], -1, nullptr, 0, nullptr, nullptr);
+
+		if (size_needed > 0)
+		{
+			std::string arg(size_needed - 1, 0);
+
+			WideCharToMultiByte(
+				CP_UTF8, 0, argvw[i], -1, arg.data(), size_needed, nullptr, nullptr);
+
+			result.push_back(std::move(arg));
+		}
+
+		else
+		{
+			result.push_back({});
+		}
+	}
+
+	return result;
+}
+
+inline std::vector<char*> MakeArgv(const std::vector<std::string>& args)
+{
+	std::vector<char*> argv{};
+	argv.reserve(args.size() + 1);
+
+	for (const auto& s : args)
+		argv.push_back(const_cast<char*>(s.c_str()));
+
+	// optional terminator string
+	argv.push_back(nullptr);
+
+	return argv;
+}
+
+inline void OpenConsole()
+{
+	// Crea una nueva consola si no existe
+	if (AllocConsole())
+	{
+		FILE* fp;
+		freopen_s(&fp, "CONOUT$", "w", stdout);
+		freopen_s(&fp, "CONOUT$", "w", stderr);
+		freopen_s(&fp, "CONIN$", "r", stdin);
+
+		// Opcional: sincroniza los streams de C++ con los de C
+		std::ios::sync_with_stdio(true);
+
+		// Opcional: mueve el cursor al final para evitar sobrescribir
+		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { 0, 0 });
+	}
+}
+
+INT APIENTRY wWinMain(
+	_In_ HINSTANCE hinstance, 
+	_In_opt_ HINSTANCE hprevinstance, 
+	_In_ PWSTR cmdline,
+	_In_ INT cmdshow)
+{
+	int argc = 0;
+	LPWSTR* argvw = CommandLineToArgvW(cmdline, &argc);
+
+	const auto args = ConvertArgvWToArgvA(argvw, argc);
+
+	//const auto console = GetStdHandle(STD_OUTPUT_HANDLE);
+	OpenConsole();
+
 	auto arguments = luma::Arguments{};
-	arguments.parse(argc, argv);
+	arguments.parse(args);
 
 	using enum luma::Context;
 	switch (luma::_options.context)
@@ -127,6 +229,13 @@ int main(int argc, char** argv)
 			{
 				demo.Start();
 			}
+		} break;
+
+		case DIRECTX:
+		{
+			luma::GPU gpu{ hinstance, 
+				static_cast<int>(luma::_options.width), static_cast<int>(luma::_options.height) };
+			gpu.loop();
 		} break;
 
 		case HEADLESS:

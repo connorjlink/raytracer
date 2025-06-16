@@ -21,12 +21,14 @@ namespace luma
 	enum class Context
 	{
 		INTERACTIVE,
+		DIRECTX,
 		HEADLESS,
 	};
 
 	static const std::unordered_map<std::string, Context> _context_map
 	{
 		{ "interative", Context::INTERACTIVE },
+		{ "directx", Context::DIRECTX },
 		{ "headless", Context::HEADLESS },
 	};
 
@@ -43,7 +45,7 @@ namespace luma
 	class Arguments
 	{
 	public:
-		void parse(int, char**);
+		void parse(const std::vector<std::string>&);
 	};
 }
 

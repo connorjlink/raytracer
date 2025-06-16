@@ -91,10 +91,8 @@ namespace luma
 {
 	using namespace std::chrono_literals;
 
-	void Arguments::parse(int argc, char** argv)
+	void Arguments::parse(const std::vector<std::string>& arguments)
 	{
-		const auto arguments = convert(argc, argv);
-		
 		for (auto& argument : arguments)
 		{
 			// parsing a command-line option

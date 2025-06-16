@@ -176,8 +176,6 @@ namespace luma
 
 	fx::vec3 Renderer::direct_illumination(const Intersection& intersection) noexcept
 	{
-
-
 		return fx::vec3();
 	}
 
@@ -367,6 +365,8 @@ namespace luma
 
 	void Renderer::render_to(std::uint32_t* target, olc::PixelGameEngine* pge) noexcept
 	{
+		pge->Clear(olc::BLACK);
+
 		fx::Timer timer{};
 
 		const auto width = _options.width;
@@ -424,15 +424,26 @@ namespace luma
 
 				const auto depth_difference = depth - camera.depth;
 
-				auto focus = 1 - std::exp(-std::pow(depth_difference, 10));
+				auto focus = 1.f - std::exp(-std::pow(depth_difference, 10));
 
-				const auto focused_blur = .001f;
-				const auto defocused_blur = .03f;
+				const auto focused_blur = .5f;
+				const auto defocused_blur = 5.f;
 
 				const auto blur = std::lerp(focused_blur, defocused_blur, focus);
 
-				const auto real_sample = render_pixel(x, y, blur);
+				const auto real_sample = render_pixel(x, y, static_cast<fx::platform_type>(blur));
 				result = real_sample.output;
+
+				const auto red = static_cast<std::uint8_t>(255.f * result[0]);
+				const auto green = static_cast<std::uint8_t>(255.f * result[1]);
+				const auto blue = static_cast<std::uint8_t>(255.f * result[2]);
+				const auto alpha = static_cast<std::uint8_t>(255.f * focus);
+				//const auto alpha = static_cast<std::uint8_t>(255.0f);
+
+				olc::Pixel p = olc::Pixel{ red, green, blue, alpha };
+
+				pge->DrawCircle(x, y, (int32_t)blur, p);
+
 				
 				if (camera.show_depth)
 				{

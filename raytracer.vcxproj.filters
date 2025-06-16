@@ -22,6 +22,9 @@
     <Filter Include="Module Header Files">
       <UniqueIdentifier>{31ee5ffc-adbd-4832-8ca3-56f385bee386}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Source Files">
+      <UniqueIdentifier>{dceda822-d963-45e8-8eb2-2b1cdd5586d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arguments.cpp">
@@ -54,6 +57,9 @@
     <ClCompile Include="flux\implementation.cpp">
       <Filter>Module Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gpu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h">
@@ -66,9 +72,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="image.h">
@@ -98,6 +101,9 @@
     <ClInclude Include="flux\base.h">
       <Filter>Module Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gpu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="stb_image.h">
@@ -108,6 +114,12 @@
     </None>
     <None Include=".gitignore">
       <Filter>Git Files</Filter>
+    </None>
+    <None Include="PixelShader.hlsl">
+      <Filter>Shader Source Files</Filter>
+    </None>
+    <None Include="VertexShader.hlsl">
+      <Filter>Shader Source Files</Filter>
     </None>
   </ItemGroup>
 </Project>

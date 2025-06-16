@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>--width=1584 --height=396 --samples=1 --bounces=4 --paths=1 --mode=pathtrace</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--width=500 --height=500 --samples=1 --bounces=4 --paths=1 --mode=pathtrace --context=directx</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>--width=1584 --height=396 --samples=1 --bounces=4 --paths=1 --mode=pathtrace</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--width=500 --height=500 --samples=1 --bounces=4 --paths=1 --mode=pathtrace --context=directx</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
